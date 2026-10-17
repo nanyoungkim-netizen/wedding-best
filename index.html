@@ -1364,8 +1364,14 @@ function faceCheck(c){
     const lm=await getLM();
     const W=c.width, H=c.height, m=Math.min(W,H);
     let found=facesIn(lm, c, 0, 0, W, H, 0.035);
-    for(const [x,y,sz] of windows(W,H,m*0.4,m*0.2,0,0)) found=found.concat(facesIn(lm,c,x,y,sz,sz,0.12));
-    for(const [x,y,sz] of windows(W,H,m*0.2,m*0.12,0.15,0.12)) found=found.concat(facesIn(lm,c,x,y,sz,sz,0.12));
+    // look window by window, letting the page breathe in between, and give each photo a time budget
+    const wins=[...windows(W,H,m*0.4,m*0.2,0,0), ...windows(W,H,m*0.2,m*0.12,0.15,0.12)];
+    const t0=performance.now();
+    for(const [x,y,sz] of wins){
+      if(upStop || performance.now()-t0 > 4000) break;
+      await new Promise(r=>setTimeout(r,0));
+      found=found.concat(facesIn(lm,c,x,y,sz,sz,0.12));
+    }
     found=found.filter(f=>f.w>=18);                     // eyes need at least a few pixels
     // the same face is seen by several windows: merge them
     const faces=[];
@@ -1458,7 +1464,7 @@ async function processFiles(list){
 }
 $('#upFiles').addEventListener('change',e=>{ processFiles([...e.target.files]); e.target.value=''; });
 $('#upDir').addEventListener('change',e=>{ processFiles([...e.target.files]); e.target.value=''; });
-$('#upStop').onclick=()=>{ upStop=true; };
+$('#upStop').onclick=()=>{ upStop=true; $('#upTxt').textContent+=' · 멈추는 중…'; };
 
 /* ---------- big view ---------- */
 const lbz=new Zoom($('#lbBox'),{ swipe:d=>lbStep(-d) });
