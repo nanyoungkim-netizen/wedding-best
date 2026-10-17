@@ -781,7 +781,8 @@ function show(id){
   if(id!=='admin') stopLive();
   document.body.classList.remove('focus'); $('#focusExit').hidden=$('#focusInfo').hidden=true;
 }
-let focusPref=false; try{ focusPref=localStorage.getItem('wb-focus')==='1'; }catch(e){}
+// phones start in big-photo mode; '작게 보기' remembers the choice
+let focusPref=matchMedia('(max-width:700px)').matches; try{ const v=localStorage.getItem('wb-focus'); if(v!==null) focusPref=v==='1'; }catch(e){}
 function applyFocus(){
   const on = focusPref && (curScreen==='pick' && !$('#pSingle').hidden || curScreen==='sort');
   document.body.classList.toggle('focus', on);
