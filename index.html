@@ -1383,7 +1383,7 @@ let upStop=false, uploading=false, wake=null;
 addEventListener('beforeunload', e=>{ if(uploading){ e.preventDefault(); e.returnValue=''; } });
 async function processFiles(list){
   if(uploading) return toast('올리는 중이에요. 끝난 뒤에 다시 골라 주세요.');
-  const useAI=$('#useAI').checked;
+  let useAI=$('#useAI').checked;
   const seen=new Set(), jobs=[];
   for(const f of list){
     if(f.name.startsWith('.')||!isImg(f)) continue;
@@ -1409,6 +1409,13 @@ async function processFiles(list){
     try{ await api('meta',{method:'POST',json:{items}}); }catch(e){ if(e.message==='signed-out'){ upStop=true; } else lastErr='정보 저장 실패'; }
   };
   paint();
+  if(useAI){
+    // the face tool (about 14MB) loads once; don't let a slow or blocked download hold everything up
+    $('#upTxt').textContent='AI 도구를 준비하는 중이에요… (처음 한 번 약 14MB를 내려받아요)';
+    const ready=await Promise.race([ getLM().then(()=>true, e=>'AI 도구를 불러오지 못했어요: '+(e?.message||e)), new Promise(r=>setTimeout(()=>r('AI 도구 준비가 1분 넘게 걸려요'),60000)) ]);
+    if(ready!==true){ useAI=false; lmP=null; lastErr=ready+' · 흐림·밝기만 먼저 살펴볼게요'; aiWarned=true; }
+    paint();
+  }
   async function worker(){
     while(jobs.length && !upStop){
       const job=jobs.shift(); let ok=false;
