@@ -200,29 +200,88 @@ input[type=password]{background:var(--panel2);border:1px solid var(--line);borde
 .chip.done{border-color:var(--keep);color:var(--keep)}
 #admin .row input[type=text]{flex:1;min-width:0}
 @media (max-width:480px){.who{width:100%;justify-content:flex-end}}
+
+/* ---------- v2: steps, cheer bar, AI marks, bulk changes ---------- */
+.cheer{display:flex;flex-direction:column;gap:4px;padding-block:8px 2px}
+.cheerbar{height:8px;border-radius:999px;background:var(--panel);overflow:hidden;box-shadow:inset 0 0 0 1px var(--line)}
+.cheerbar i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#8cc7a4,var(--rose));transition:width .4s}
+.cheertxt{font-size:12.5px;color:var(--mute)}
+.cheertxt b{color:var(--rose);font-variant-numeric:tabular-nums}
+.panel{display:flex;flex-direction:column;gap:10px;flex:1;min-height:0}
+.grouphead{font-size:14px;color:var(--mute)}
+.grouphead b{color:var(--fg)}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:640px;width:100%;margin:0 auto}
+.three .choice{flex-direction:column;align-items:center;gap:2px;font-size:22px;min-height:68px}
+.three .choice span{font-size:15px}
+.choice.must{background:#cfe8d6;color:#173d29}
+.choice.maybe{background:#f6e7bf;color:#4a3a10}
+.choice.out{background:#f3d3cf;color:#5a1f19}
+.notice{margin:0;background:#fff4dc;color:#5a4410;border-radius:12px;padding:8px 12px;font-size:13.5px}
+.importbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--mute)}
+.tiplist{margin:0;padding-left:18px;color:var(--mute);font-size:13.5px;display:flex;flex-direction:column;gap:3px}
+.pwnow{display:flex;gap:16px;flex-wrap:wrap;background:var(--panel2);border-radius:12px;padding:10px 12px;font-size:14px}
+.pwnow b{font-family:ui-monospace,Menlo,monospace;color:var(--rose);margin-left:4px}
+.selbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px;font-size:13.5px;color:var(--mute)}
+.ck{position:absolute;right:6px;top:6px;width:30px;height:30px;border-radius:50%;border:2px solid #fff;background:rgba(0,0,0,.35);box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.tile.picked{border-color:var(--rose);box-shadow:0 0 0 2px var(--rose)}
+.tile.picked .ck{background:var(--rose)}
+.tile.picked .ck::after{content:"✓";color:#fff;font-size:16px;font-weight:700;display:grid;place-items:center;height:100%}
+.badge.in{background:var(--rose);color:#fff}
+.badge.out{background:rgba(0,0,0,.6);color:#eee}
+.badge.none{background:rgba(255,255,255,.85);color:#333}
+.badge.must{background:#cfe8d6;color:#173d29}
+.badge.maybe{background:#f6e7bf;color:#4a3a10}
+.aitags{position:absolute;left:6px;bottom:26px;display:flex;flex-wrap:wrap;gap:4px;pointer-events:none;max-width:calc(100% - 12px)}
+.zbox .aitags{bottom:auto;top:44px;left:10px}
+.ai{font-size:11px;padding:2px 7px;border-radius:999px;white-space:nowrap}
+.ai.best{background:#fff6cf;color:#5c4a00}
+.ai.warn{background:rgba(192,86,74,.92);color:#fff}
+.grid.mini{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}
+#lbAct{min-width:96px}
+#lbAct.on{background:var(--rose);color:var(--rose-ink);border-color:var(--rose)}
+@media (max-width:480px){
+  .three .choice{min-height:58px;font-size:20px}
+  header{padding-block:6px;gap:4px}
+  .brand{font-size:15px}
+  nav{margin-left:0;gap:2px;width:100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  nav::-webkit-scrollbar{display:none}
+  nav button{padding:3px 7px;font-size:12px;gap:4px;flex:none}
+  nav button b{width:16px;height:16px;font-size:10px}
+  .who{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:calc(8px + env(safe-area-inset-top,0px));width:auto}
+  #app{position:relative}
+  .cheer{padding-block:4px 0}
+  .cheertxt{font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .screen{padding-block:8px;gap:8px}
+  .meta{font-size:12px}
+}
 </style>
 </head>
 <body>
 <div id="app">
   <header>
-    <button class="brand" id="brandBtn" aria-label="처음 화면">웨딩스냅 <em>베스트 <span class="maxN">20</span></em></button>
+    <button class="brand" id="brandBtn" aria-label="하던 곳으로">웨딩스냅 <em>베스트 <span class="maxN">20</span></em></button>
     <nav id="nav" aria-label="단계" hidden>
-      <button data-go="s1"><b>1</b>거르기</button>
-      <button data-go="s2"><b>2</b>비교</button>
-      <button data-go="s3"><b>3</b>최종 <span class="maxN">20</span></button>
-      <button data-go="gallery"><b>★</b>갤러리</button>
+      <button data-go="pick"><b>1</b>고르기</button>
+      <button data-go="scene"><b>2</b>장면</button>
+      <button data-go="sort"><b>3</b>나누기</button>
+      <button data-go="final"><b>4</b>최종 <span class="maxN">20</span></button>
+      <button data-go="gallery"><b>★</b>결과</button>
       <button data-go="admin" id="navAdmin" hidden><b>⚙</b>관리</button>
     </nav>
     <div class="who" id="whoBox" hidden><span id="whoName"></span> <span class="sync" id="syncTxt"></span> <button class="linkbtn" id="logout">나가기</button></div>
   </header>
+  <div class="cheer" id="cheer" hidden>
+    <div class="cheerbar"><i id="cheerFill"></i></div>
+    <div class="cheertxt"><b id="cheerPct">0%</b> <span id="cheerLeft"></span> <span id="cheerMsg"></span></div>
+  </div>
 
   <main>
     <!-- LOGIN -->
     <section class="screen scroll" id="login">
       <div class="home">
         <span class="eyebrow">💐 우리 결혼사진 고르기</span>
-        <h1><span>우리의 베스트</span>를 골라요</h1>
-        <p class="lead">받은 암호와 이름을 적고 들어오세요. 같은 이름으로 다시 들어오면 고르던 곳부터 이어져요. 다른 휴대폰에서 들어와도 돼요.</p>
+        <h1><span>우리 결혼사진</span>, 같이 골라 주세요</h1>
+        <p class="lead">이름과 받은 암호를 넣으면 시작해요.<br>다음에 같은 이름으로 들어오면 하던 곳부터 이어서 할 수 있어요.</p>
         <form class="card" id="loginForm" autocomplete="on">
           <div class="field"><label for="lName">이름</label><input type="text" id="lName" maxlength="20" autocomplete="nickname" required></div>
           <div class="field"><label for="lPw">암호</label><input type="password" id="lPw" autocomplete="current-password" required></div>
@@ -230,114 +289,135 @@ input[type=password]{background:var(--panel2);border:1px solid var(--line);borde
           <p class="err" id="lErr" role="alert"></p>
         </form>
         <ol class="steps">
-          <li><span class="n">1단계</span><strong>빠르게 거르기</strong><small>한 장씩 보고 → 좋아요, ← 패스.</small></li>
-          <li><span class="n">2단계</span><strong>비슷한 사진 대결</strong><small>연달아 찍은 사진끼리 A·B로 비교해요.</small></li>
-          <li><span class="n">3단계</span><strong>최종 <span class="maxN">20</span>장</strong><small>하트를 눌러 정해진 장수만큼 고르면 그게 내 투표예요.</small></li>
-          <li><span class="n">갤러리</span><strong>모두의 베스트</strong><small>표를 많이 받은 순서대로 모아 봐요.</small></li>
+          <li><span class="n">1단계</span><strong>마음에 드는 사진 고르기</strong><small>한 장씩 보면서 좋으면 ♥, 아니면 ✕. 연달아 찍은 사진은 한 번에 봐요</small></li>
+          <li><span class="n">2단계</span><strong>장면별로 고르기</strong><small>장면마다 꼭 넣고 싶은 사진을 1~5장 골라요</small></li>
+          <li><span class="n">3단계</span><strong>세 칸으로 나누기</strong><small>💚 꼭 넣기 · 🤔 고민 · ✕ 빼기</small></li>
+          <li><span class="n">4단계</span><strong>최종 <span class="maxN">20</span>장 투표</strong><small>💚 사진은 ♥가 켜진 채로 시작해요. 남은 자리만 채우면 끝</small></li>
+          <li><span class="n">결과</span><strong>다 같이 고른 결과</strong><small>단계마다 받은 점수를 더해 순위로 보여줘요</small></li>
         </ol>
       </div>
     </section>
 
     <section class="screen" id="loading" hidden>
-      <div class="done"><span class="spin" aria-hidden="true"></span><p id="loadingTxt">사진을 불러오는 중이에요…</p></div>
+      <div class="done"><span class="spin" aria-hidden="true"></span><p>사진을 불러오는 중이에요…</p></div>
     </section>
 
     <section class="screen" id="empty" hidden>
       <div class="done">
-        <h2>아직 사진이 없어요</h2>
-        <p>신랑·신부가 사진을 올리면 바로 시작할 수 있어요. 잠시 뒤 다시 들어와 주세요.</p>
+        <h2>사진을 준비하고 있어요</h2>
+        <p>신랑·신부가 사진을 올리는 중이에요. 조금 뒤에 다시 들어와 주세요.</p>
         <button class="btn main" id="emptyAdmin" hidden data-go="admin">사진 올리러 가기 →</button>
         <button class="btn ghost small" id="emptyReload">다시 확인하기</button>
       </div>
     </section>
-    <!-- STAGE 1 -->
-    <section class="screen" id="s1" hidden>
-      <div class="meta"><span>1단계 · 빠르게 거르기 <button class="revlink" data-open-rev="s1">패스한 사진 다시 보기</button></span><span><strong id="s1count">0 / 0</strong> 봄 · 좋아요 <strong id="s1likes">0</strong>장</span></div>
-      <div class="prog"><i id="s1prog"></i></div>
-      <div class="zbox" id="s1box"><img alt=""><span class="tag"></span><span class="stamp like">좋아요</span><span class="stamp nope">패스</span></div>
-      <div class="bar">
-        <button class="btn ghost small" id="s1undo">↶ 되돌리기</button>
-        <button class="big no" id="s1no" aria-label="패스">✕</button>
-        <button class="big yes" id="s1yes" aria-label="좋아요">♥</button>
-        <button class="btn ghost small" id="s1skip">비교 단계로 →</button>
+
+    <!-- STEP 1: pick -->
+    <section class="screen" id="pick" hidden>
+      <div class="meta"><span>1단계 · 마음에 드는 사진 고르기 <button class="revlink" data-all="pick">이 단계 전체 보기</button></span><span><strong id="pCount">0 / 0</strong>장 봤어요 · ♥ <strong id="pLikes">0</strong>장</span></div>
+      <div class="panel" id="pSingle">
+        <div class="zbox" id="s1box"><img alt=""><span class="tag"></span><span class="stamp like">♥ 좋아요</span><span class="stamp nope">✕ 넘기기</span></div>
+        <div class="bar">
+          <button class="btn ghost small" id="pUndo">↶ 되돌리기</button>
+          <button class="big no" id="pNo" aria-label="넘기기">✕</button>
+          <button class="big yes" id="pYes" aria-label="좋아요">♥</button>
+          <button class="btn ghost small" data-go="scene">2단계로 넘어가기 →</button>
+        </div>
+        <div class="hint">오른쪽으로 밀면 ♥, 왼쪽으로 밀면 ✕ · 두 번 톡 하면 확대</div>
       </div>
-      <div class="hint">밀어서 넘기기 · 두 번 탭하거나 두 손가락으로 확대 · 키보드 ← → , 되돌리기 Z</div>
+      <div class="panel" id="pGroup" hidden>
+        <div class="grouphead"><b>연달아 찍은 사진 <span id="gCount">0</span>장</b> · 마음에 드는 사진에 ♥ (여러 장 가능, 안 골라도 돼요)</div>
+        <div class="gridwrap"><div class="grid" id="gGrid"></div></div>
+        <div class="hint">사진을 누르고 ◀ ▶로 넘기면 같은 자리에서 차이가 잘 보여요</div>
+        <div class="bar">
+          <button class="btn ghost small" id="gUndo">↶ 되돌리기</button>
+          <button class="btn" id="gNone">✕ 전부 넘기기</button>
+          <button class="btn main" id="gKeep">♥ 고른 것 남기고 다음 →</button>
+        </div>
+      </div>
     </section>
-    <section class="screen" id="s1done" hidden>
+    <section class="screen" id="pickdone" hidden>
       <div class="done">
-        <h2>1,000장 다 봤어요</h2>
-        <p id="s1doneTxt"></p>
-        <button class="btn main" data-go="s2">비슷한 사진 비교하러 가기 →</button>
-        <button class="btn ghost small" id="s1back">마지막 사진 되돌리기</button>
-        <button class="btn ghost small" data-open-rev="s1">패스한 사진 다시 보기</button>
+        <h2 id="pdH"></h2>
+        <p id="pdTxt"></p>
+        <button class="btn main" data-go="scene">2단계 시작하기 →</button>
+        <button class="btn ghost small" id="pdUndo">마지막 사진 다시 보기</button>
+        <button class="btn ghost small" data-all="pick">넘긴 사진 다시 보기</button>
       </div>
     </section>
 
-    <!-- STAGE 2 -->
-    <section class="screen" id="s2" hidden>
-      <div class="meta"><span>2단계 · <span id="s2round">1</span>번째 비교 <button class="revlink" data-open-rev="s2">빠진 사진 다시 보기</button></span><span>남은 비교 <strong id="s2left">0</strong> · 살아남은 사진 <strong id="s2kept">0</strong>장</span></div>
-      <div class="prog"><i id="s2prog"></i></div>
-      <div class="duel">
-        <div class="zbox" id="s2a"><img alt=""><img alt="" class="flipimg" hidden><span class="tag"></span><span class="ab">A</span></div>
-        <div class="zbox" id="s2b"><img alt=""><span class="tag"></span><span class="ab">B</span></div>
-      </div>
-      <div class="looks" id="flipTip"><b>사진을 톡 누르면 A⇄B</b> · 두 번 톡하면 확대</div>
-      <div class="looks"><b>보는 곳</b> 눈 감음 · 표정 · 흔들림 · 손·드레스 · 뒤 사람</div>
-      <div class="choose">
-        <button class="choice ca" id="s2l"><span class="let">A</span><span>가 더 좋아요</span></button>
-        <button class="choice cb" id="s2r"><span class="let">B</span><span>가 더 좋아요</span></button>
-      </div>
-      <div class="bar">
-        <button class="btn small ghost" id="s2undo">↶ 되돌리기</button>
-        <button class="btn small" id="s2both">고민되면 둘 다 남기기</button>
-      </div>
-      <div class="bar">
-        <button class="btn small" id="flipBtn" aria-pressed="false">한 장씩 크게 보기</button>
-        <button class="btn small main" id="flipSwap" hidden>지금 <b id="flipNow">A</b> · A⇄B 바꾸기</button>
-        <label class="check" id="syncWrap"><input type="checkbox" id="sync" checked> 같이 확대</label>
-      </div>
-      <div class="hint">키보드 ← A, → B, ↓ 둘 다, F 번갈아 보기 · 확대한 상태에서 번갈아 보면 차이가 잘 보여요</div>
-    </section>
-    <section class="screen" id="s2done" hidden>
-      <div class="done">
-        <h2 id="s2doneH"></h2>
-        <p id="s2doneTxt"></p>
-        <button class="btn main" data-go="s3">최종 <span class="maxN">20</span>장 고르러 가기 →</button>
-        <button class="btn" id="s2again">남은 사진끼리 한 번 더 비교</button>
-        <button class="btn ghost small" data-open-rev="s2">비교에서 빠진 사진 다시 보기</button>
-        <button class="btn ghost small" id="s2restart">1단계 좋아요부터 비교 다시 하기</button>
-      </div>
-    </section>
-
-    <!-- STAGE 3 -->
-    <section class="screen" id="s3" hidden>
-      <div class="meta"><span>3단계 · 하트를 눌러 <span class="maxN">20</span>장을 채워요. 사진을 누르면 크게 볼 수 있어요. <button class="revlink" data-open-rev="s2">빠진 사진에서 찾기</button></span><span>후보 <strong id="s3pool">0</strong>장</span></div>
-      <div class="gridwrap"><div class="grid" id="s3grid"></div></div>
+    <!-- STEP 2: scenes -->
+    <section class="screen" id="scene" hidden>
+      <div class="meta"><span>2단계 · 장면별로 고르기 <button class="revlink" data-all="scene">이 단계 전체 보기</button></span><span id="scInfo"></span></div>
+      <div class="grouphead"><b id="scTitle"></b> · 이 장면에서 꼭 넣고 싶은 사진을 <b>1~5장</b> 골라 주세요</div>
+      <div class="gridwrap"><div class="grid" id="scGrid"></div></div>
       <div class="foot">
-        <div class="counter" id="s3c"><span id="s3n">0</span> / <span class="maxN">20</span></div>
-        <span class="hint">고른 사진이 바로 내 투표가 돼요</span>
-        <button class="btn main" data-go="gallery">모두의 투표 보기 →</button>
+        <button class="btn ghost small" id="scPrev">← 이전 장면</button>
+        <div class="counter" id="scC"><span id="scN">0</span> / 5</div>
+        <button class="btn main" id="scNext">다음 장면 →</button>
       </div>
     </section>
 
-    <!-- REVIEW: bring back photos -->
-    <section class="screen" id="review" hidden>
-      <div class="meta"><span>지나간 사진 다시 보기 · 하트를 누르면 다시 후보로 살아나요 (한 번 더 누르면 취소)</span><button class="btn small" id="revBack">← 하던 곳으로</button></div>
-      <div class="row">
-        <button class="btn small" data-rev="s1">1단계에서 패스한 사진 <b id="revN1">0</b></button>
-        <button class="btn small" data-rev="s2">2단계 비교에서 빠진 사진 <b id="revN2">0</b></button>
+    <!-- STEP 3: sort into three -->
+    <section class="screen" id="sort" hidden>
+      <div class="meta"><span>3단계 · 세 칸으로 나누기 <button class="revlink" data-all="sort">이 단계 전체 보기</button></span><span><strong id="soCount">0 / 0</strong>장 · 💚 <strong id="soMust">0</strong> · 🤔 <strong id="soMaybe">0</strong> · ✕ <strong id="soOut">0</strong></span></div>
+      <div class="zbox" id="soBox"><img alt=""><span class="tag"></span></div>
+      <div class="three">
+        <button class="choice must" id="soM">💚<span>꼭 넣기</span></button>
+        <button class="choice maybe" id="soY">🤔<span>고민</span></button>
+        <button class="choice out" id="soX">✕<span>빼기</span></button>
       </div>
-      <div class="gridwrap"><div class="grid" id="revGrid"></div></div>
+      <div class="bar"><button class="btn ghost small" id="soUndo">↶ 되돌리기</button><span class="hint">두 번 톡 하면 확대 · 키보드 1 2 3</span></div>
+    </section>
+    <section class="screen" id="sortdone" hidden>
+      <div class="done">
+        <h2>다 나눴어요! 🎉</h2>
+        <p id="sdTxt"></p>
+        <button class="btn main" data-go="final">4단계 시작하기 →</button>
+        <button class="btn ghost small" id="sdUndo">마지막 사진 다시 보기</button>
+        <button class="btn ghost small" data-all="sort">나눈 사진 다시 보기</button>
+      </div>
     </section>
 
-    <!-- GALLERY -->
+    <!-- STEP 4: final vote -->
+    <section class="screen" id="final" hidden>
+      <div class="meta"><span>4단계 · 최종 <span class="maxN">20</span>장에 ♥를 눌러 주세요 · 사진을 누르면 크게 보여요 <button class="revlink" data-all="final">이 단계 전체 보기</button></span><span>후보 <strong id="fPool">0</strong>장</span></div>
+      <p class="notice" id="fNotice" hidden></p>
+      <div class="importbar"><span>예전 사이트에서 고른 게 있나요?</span><button class="revlink" id="impOpen">이전 결과 붙여넣기</button></div>
+      <div class="card" id="impBox" hidden>
+        <p>예전 사이트의 “내 결과 복사” 글을 붙여넣으면 ♥가 자동으로 켜져요.</p>
+        <textarea class="code" id="impText" placeholder="[웨딩 베스트20] 이름 · 20장&#10;MDS_0175.JPG&#10;…"></textarea>
+        <div class="row"><button class="btn main small" id="impDo">가져오기</button><button class="btn ghost small" id="impClose">닫기</button></div>
+      </div>
+      <div class="gridwrap"><div class="grid" id="fGrid"></div></div>
+      <div class="foot">
+        <div class="counter" id="fC"><span id="fN">0</span> / <span class="maxN">20</span></div>
+        <span class="hint">♥ 누른 사진이 바로 내 투표예요</span>
+        <button class="btn main" data-go="gallery">다 같이 고른 결과 보기 →</button>
+      </div>
+    </section>
+
+    <!-- ALL PHOTOS OF A STEP -->
+    <section class="screen" id="all" hidden>
+      <div class="meta"><span id="allTitle"></span><button class="btn small" id="allBack">← 하던 곳으로</button></div>
+      <div class="chips" id="allChips"></div>
+      <div class="gridwrap"><div class="grid" id="allGrid"></div></div>
+      <div class="selbar" id="allSel">
+        <span id="allSelN">사진을 선택하면 한 번에 바꿀 수 있어요</span>
+        <div class="row" id="allActs"></div>
+      </div>
+    </section>
+
+    <!-- RESULTS -->
     <section class="screen" id="gallery" hidden>
-      <div class="meta"><span>★ 갤러리 · 표를 많이 받은 순서예요. 사진을 누르면 크게 볼 수 있어요.</span><button class="btn small" id="galRefresh">새로고침</button></div>
+      <div class="meta"><span>★ 다 같이 고른 결과 · 점수 높은 사진부터 보여요</span><span class="row"><button class="chipbtn on" id="galByScore">총점 순</button><button class="chipbtn" id="galByFinal">최종 ♥만</button><button class="btn small" id="galRefresh">새로고침</button></span></div>
       <div class="chips" id="galVoters"></div>
       <div class="gridwrap"><div class="grid" id="galGrid"></div></div>
       <div class="foot">
         <span class="hint" id="galInfo"></span>
-        <button class="btn main" id="galCopy">상위 <span class="maxN">20</span>장 목록 복사</button>
+        <div class="row">
+          <button class="btn" id="galZip">상위 <span class="maxN">20</span>장 사진 내려받기 (압축파일)</button>
+          <button class="btn main" id="galCopy">사진작가에게 보낼 목록 복사 (상위 <span class="maxN">20</span>장)</button>
+        </div>
       </div>
       <textarea class="code" id="galCode" readonly hidden></textarea>
     </section>
@@ -347,8 +427,22 @@ input[type=password]{background:var(--panel2);border:1px solid var(--line);borde
       <div class="merge">
         <h2>관리</h2>
         <div class="card">
-          <h3>① 사진 올리기</h3>
-          <p>지금 <b id="admCount">0</b>장이 올라가 있어요. 화면으로 보기 좋은 크기로 줄여서 올리고, 이미 올린 이름의 사진은 건너뛰어요. 아이폰은 iCloud 폴더를 먼저 ‘다운로드’해 두면 빨라요.</p>
+          <h3>① 지금 순위 (점수 높은 순 최대 20장)</h3>
+          <p id="liveInfo">불러오는 중…</p>
+          <div class="grid mini" id="liveGrid"></div>
+          <p class="hint" style="text-align:left">30초마다 자동으로 새로 고쳐져요. 점수: 1단계 ♥ +1 · 2단계 +2 · 3단계 💚 +3 / 🤔 +1 · 4단계 최종 ♥ +3</p>
+        </div>
+        <div class="card">
+          <h3>② 사진 올리기</h3>
+          <p>지금 <b id="admCount">0</b>장이 올라가 있어요. <span id="admMeta"></span></p>
+          <ul class="tiplist">
+            <li>올리는 동안 이 화면을 켜 두세요. 다른 앱으로 가면 멈춰요.</li>
+            <li>멈추면 같은 사진을 다시 고르세요. 이미 올라간 사진은 건너뛰어요.</li>
+            <li>이미 올린 사진도 같은 폴더를 다시 고르면 <b>찍은 시각과 AI 표시</b>가 채워져요.</li>
+            <li>휴대폰은 200장씩 나눠 올리면 덜 멈춰요. PC가 가장 빨라요.</li>
+            <li>사진은 보기 좋은 크기로 줄여서 올라가요. 원본은 그대로예요.</li>
+          </ul>
+          <label class="check"><input type="checkbox" id="useAI" checked> AI로 눈 감음·흐림·밝기 살펴보기 (PC 추천, 조금 더 걸려요)</label>
           <div class="row">
             <label class="btn main">사진 골라서 올리기<input type="file" id="upFiles" accept="image/*,.heic,.heif" multiple></label>
             <label class="btn">폴더 통째로 (PC)<input type="file" id="upDir" webkitdirectory multiple></label>
@@ -361,28 +455,29 @@ input[type=password]{background:var(--panel2);border:1px solid var(--line);borde
           <div class="row" id="delRow"><button class="btn small ghost" id="delAll">올린 사진 모두 지우기</button></div>
         </div>
         <div class="card">
-          <h3>② 최종 몇 장을 고를까요?</h3>
-          <p>모든 사람에게 같은 장수가 적용돼요. 한 사람이 고른 이 장수만큼이 그 사람의 투표예요.</p>
+          <h3>③ 최종 몇 장을 고를까요?</h3>
+          <p>모두에게 같은 장수가 적용돼요. 각자 4단계에서 ♥를 누른 사진이 그 사람의 최종 투표가 돼요.</p>
           <div class="row">
             <span class="maxCtl"><button class="maxStep" data-d="-1" aria-label="한 장 줄이기">−</button><input type="number" class="maxIn" id="maxIn" inputmode="numeric" min="1" max="300" value="20" aria-label="최종으로 고를 사진 수"><button class="maxStep" data-d="1" aria-label="한 장 늘리기">+</button><span>장</span></span>
             <button class="chipbtn" data-max="10">10장</button><button class="chipbtn" data-max="20">20장</button><button class="chipbtn" data-max="30">30장</button><button class="chipbtn" data-max="50">50장</button>
           </div>
         </div>
         <div class="card">
-          <h3>③ 초대하기</h3>
+          <h3>④ 초대하기</h3>
           <p>아래 글을 복사해서 카톡으로 보내 주세요.</p>
           <textarea class="code" id="invite" readonly></textarea>
           <div class="row"><button class="btn" id="copyInvite">초대 글 복사</button></div>
         </div>
         <div class="card">
-          <h3>④ 암호 바꾸기</h3>
-          <div class="field"><label for="newVote">투표 암호 (가족·친구용, 4자 이상)</label><div class="row"><input type="text" id="newVote" autocomplete="off"><button class="btn small" id="saveVote">바꾸기</button></div></div>
-          <div class="field"><label for="newAdmin">관리자 암호 (6자 이상)</label><div class="row"><input type="text" id="newAdmin" autocomplete="off"><button class="btn small" id="saveAdmin">바꾸기</button></div></div>
-          <p>투표 암호를 바꾸면 이미 들어와 있던 사람도 새 암호로 다시 들어와야 해요. 고른 기록은 그대로 남아요.</p>
+          <h3>⑤ 암호</h3>
+          <div class="pwnow"><span>지금 투표 암호 <b id="curVote">-</b></span><span>지금 관리자 암호 <b id="curAdmin">-</b></span></div>
+          <div class="field"><label for="newVote">투표 암호 바꾸기 (가족·친구용, 4자 이상)</label><div class="row"><input type="text" id="newVote" autocomplete="off"><button class="btn small" id="saveVote">바꾸기</button></div></div>
+          <div class="field"><label for="newAdmin">관리자 암호 바꾸기 (6자 이상)</label><div class="row"><input type="text" id="newAdmin" autocomplete="off"><button class="btn small" id="saveAdmin">바꾸기</button></div></div>
+          <p>투표 암호를 바꾸면 이미 들어와 있던 사람도 새 암호로 다시 들어와야 해요. 고른 사진은 그대로 남아요.</p>
         </div>
         <div class="card">
-          <h3>⑤ 투표 기록 지우기</h3>
-          <p>모든 사람의 고른 기록과 표가 사라져요. 되돌릴 수 없어요.</p>
+          <h3>⑥ 투표 기록 지우기</h3>
+          <p>모든 사람이 고른 사진과 점수가 사라져요. 되돌릴 수 없으니 꼭 필요할 때만 눌러 주세요.</p>
           <div class="row" id="resetRow"><button class="btn small ghost" id="resetVotes">모든 투표 기록 지우기</button></div>
         </div>
       </div>
@@ -394,7 +489,7 @@ input[type=password]{background:var(--panel2);border:1px solid var(--line);borde
   <div class="top">
     <button class="pill" id="lbClose">닫기</button>
     <span class="nm" id="lbName"></span>
-    <button class="pill" id="lbHeart">♥ 선택</button>
+    <button class="pill" id="lbAct"></button>
   </div>
   <div class="zbox" id="lbBox"><img alt=""></div>
   <div class="bar">
@@ -410,14 +505,27 @@ const $ = s => document.querySelector(s);
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const cmp = (a,b) => a.localeCompare(b, undefined, {numeric:true});
 const AUTH = 'wb-auth';
+const STEPS = ['pick','scene','sort','final'];
+const SCENE_MIN = 1, SCENE_MAX = 5;
 
-let token = null, me = null;          // me = {role, name}
+let token = null, me = null;
 let MAXV = 20;
 const maxN = () => MAXV;
-let photos = new Map();               // name -> {name,url,w,h}
-let names = [];                       // sorted
+let photos = new Map();      // name -> {name,url,w,h,taken_at,hash,q}
+let order = [];              // names in shooting order
+let units = [];              // step 1: single photos or bursts of near-identical shots
+let aiBest = new Set();
 let st = fresh();
-function fresh(){ return { stage:'s1', s1:{}, s1hist:[], s2:null, s3:[] }; }
+function fresh(){ return { v:2, stage:'pick', s1:{}, s1hist:[], scene:{}, sceneIdx:0, bucket:{}, bucketHist:[], final:[], finalInit:false }; }
+function migrate(s){
+  if(!s || typeof s!=='object' || !Object.keys(s).length) return fresh();
+  if(s.v===2) return Object.assign(fresh(), s);
+  // first version: keep step-1 choices and the old final picks
+  const n=fresh();
+  n.s1=s.s1||{}; n.s1hist=(s.s1hist||[]).map(x=>Array.isArray(x)?x:[x]);
+  n.final=Array.isArray(s.s3)?s.s3:[]; n.finalInit=n.final.length>0;
+  return n;
+}
 
 /* ---------- toast ---------- */
 let tt;
@@ -431,7 +539,7 @@ async function api(path, opt={}){
   let r;
   try { r = await fetch('/api/'+path, { method: opt.method||'GET', headers, body: opt.body }); }
   catch(e){ throw new Error('인터넷 연결을 확인해 주세요.'); }
-  if (r.status === 401 && path !== 'login'){ signOut('다시 들어와 주세요. 암호가 바뀌었을 수 있어요.'); throw new Error('signed-out'); }
+  if (r.status === 401 && path !== 'login'){ signOut('다시 들어와 주세요. 암호가 바뀌었다면 신랑·신부에게 새 암호를 물어봐 주세요.'); throw new Error('signed-out'); }
   const d = await r.json().catch(()=>({}));
   if (!r.ok) throw new Error(d.error || '잠시 뒤 다시 시도해 주세요.');
   return d;
@@ -446,11 +554,12 @@ function save(){
   try { localStorage.setItem(localKey(), JSON.stringify(st)); } catch(e){}
   clearTimeout(saveT); saveT = setTimeout(flush, 1200);
   setSync('저장 중…');
+  cheer();
 }
 async function flush(leaving){
   if (!dirty || !token || saving) return;
   dirty = false; saving = true;
-  const body = JSON.stringify({ state: st, picks: st.s3 });
+  const body = JSON.stringify({ state: st, picks: st.final });
   try {
     const r = await fetch('/api/me', { method:'PUT', keepalive: !!leaving && body.length < 60000,
       headers:{ 'content-type':'application/json', authorization:'Bearer '+token }, body });
@@ -458,15 +567,113 @@ async function flush(leaving){
     if (!r.ok) throw new Error();
     setSync(dirty ? '저장 중…' : '✓ 저장됨');
   } catch(e){
-    dirty = true; setSync('저장 대기 중'); clearTimeout(saveT); saveT = setTimeout(flush, 5000);
+    dirty = true; setSync('인터넷이 연결되면 저장돼요'); clearTimeout(saveT); saveT = setTimeout(flush, 5000);
   } finally { saving = false; if (dirty) { clearTimeout(saveT); saveT = setTimeout(flush, 1200); } }
 }
 addEventListener('pagehide', ()=>flush(true));
 document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState==='hidden') flush(true); });
 
-/* ---------- full-size image helpers ---------- */
+/* ---------- photos: order, bursts, AI marks ---------- */
 const fullURL = n => photos.get(n)?.url || '';
 function preload(n){ const u=fullURL(n); if(u){ const i=new Image(); i.decoding='async'; i.src=u; } }
+const tms = p => p && p.taken_at ? Date.parse(p.taken_at) : null;
+function hamming(a,b){
+  if(!a||!b) return 99;
+  let d=0;
+  for(let i=0;i<16;i+=4){ let x=parseInt(a.slice(i,i+4),16)^parseInt(b.slice(i,i+4),16); while(x){ d+=x&1; x>>=1; } }
+  return d;
+}
+function buildOrder(){
+  const list=[...photos.values()];
+  const allTimed=list.length>0 && list.every(p=>p.taken_at);
+  list.sort((a,b)=> allTimed ? (tms(a)-tms(b) || cmp(a.name,b.name)) : cmp(a.name,b.name));
+  order=list.map(p=>p.name);
+  // near-identical shots: taken within 3 seconds AND looking almost the same
+  units=[]; let cur=[];
+  for(let i=0;i<list.length;i++){
+    const p=list[i], prev=list[i-1];
+    let same=false;
+    if(prev){
+      const d=hamming(prev.hash,p.hash), ta=tms(prev), tb=tms(p);
+      same = (ta!=null && tb!=null) ? (Math.abs(tb-ta)<=3000 && d<=14) : d<=8;
+    }
+    if(same && cur.length<12) cur.push(p.name); else { if(cur.length) units.push(cur); cur=[p.name]; }
+  }
+  if(cur.length) units.push(cur);
+  // AI marks: blur is judged against this wedding's own photos
+  const sharp=list.map(p=>p.q?.sharp).filter(x=>typeof x==='number').sort((a,b)=>a-b);
+  const med=sharp.length ? sharp[Math.floor(sharp.length/2)] : 0;
+  for(const p of list) if(p.q && typeof p.q.sharp==='number') p.q.blur = med>0 && p.q.sharp < med*0.35;
+  const good=p=>p.q && !p.q.closed && !p.q.blur && !p.q.expo;
+  aiBest=new Set();
+  for(const u of units){
+    const c=u.map(n=>photos.get(n)).filter(good).sort((a,b)=>(b.q.sharp||0)-(a.q.sharp||0));
+    if(!c.length) continue;
+    if(u.length>1 || (c[0].q.sharp||0)>=med) aiBest.add(c[0].name);
+  }
+}
+function aiTags(n){
+  const q=photos.get(n)?.q, t=[];
+  if(aiBest.has(n)) t.push(['best','✨ AI 추천']);
+  if(q?.closed) t.push(['warn','⚠️ 눈 감음']);
+  if(q?.blur) t.push(['warn','⚠️ 흐림']);
+  if(q?.expo==='dark') t.push(['warn','⚠️ 어두움']);
+  if(q?.expo==='bright') t.push(['warn','⚠️ 너무 밝음']);
+  return t;
+}
+function tagEl(n){
+  const t=aiTags(n); if(!t.length) return null;
+  const d=document.createElement('div'); d.className='aitags';
+  for(const [c,x] of t){ const s=document.createElement('span'); s.className='ai '+c; s.textContent=x; d.append(s); }
+  return d;
+}
+
+/* ---------- what each step works on ---------- */
+const liked = () => order.filter(n=>st.s1[n]===1);
+function scenes(){
+  const L=liked(); if(!L.length) return [];
+  const allTimed=L.every(n=>photos.get(n).taken_at);
+  const groups=[]; let cur=[];
+  for(let i=0;i<L.length;i++){
+    const split = allTimed && i>0 && (tms(photos.get(L[i]))-tms(photos.get(L[i-1]))) > 10*60*1000;
+    if(split && cur.length){ groups.push(cur); cur=[]; }
+    cur.push(L[i]);
+  }
+  if(cur.length) groups.push(cur);
+  // keep every scene small enough to look at on one screen
+  const out=[];
+  for(const g of groups){
+    const cap = allTimed ? 25 : 15;
+    const parts=Math.ceil(g.length/cap), size=Math.ceil(g.length/parts);
+    for(let i=0;i<g.length;i+=size) out.push(g.slice(i,i+size));
+  }
+  return out;
+}
+const scenePicked = sc => sc.filter(n=>st.scene[n]===1).length;
+function autoScenes(sc){ let ch=false; for(const s of sc) if(s.length===1 && st.scene[s[0]]!==1){ st.scene[s[0]]=1; ch=true; } return ch; }
+const sortItems = () => liked().filter(n=>st.scene[n]===1);
+const finalPool = () => { const it=sortItems(); return [...it.filter(n=>st.bucket[n]==='must'), ...it.filter(n=>st.bucket[n]==='maybe')]; };
+
+/* ---------- progress bar that cheers you on ---------- */
+function cheer(){
+  const box=$('#cheer');
+  const step=STEPS.includes(curScreen) || curScreen==='pickdone' || curScreen==='sortdone';
+  box.hidden = !token || !order.length || !step;
+  if(box.hidden) return;
+  const tot=order.length, seen=order.filter(n=>n in st.s1).length;
+  const sc=scenes(), scDone=sc.filter(s=>scenePicked(s)>=SCENE_MIN).length;
+  const it=sortItems(), sorted=it.filter(n=>st.bucket[n]).length;
+  const fin=Math.min(st.final.length, MAXV);
+  let pct, left;
+  if(seen<tot){ pct=seen/tot*55; left=`1단계 남은 사진 ${(tot-seen).toLocaleString()}장`; }
+  else if(scDone<sc.length){ pct=55+scDone/sc.length*20; left=`2단계 남은 장면 ${sc.length-scDone}개`; }
+  else if(sorted<it.length){ pct=75+sorted/it.length*15; left=`3단계 남은 사진 ${it.length-sorted}장`; }
+  else if(fin<MAXV){ pct=90+fin/MAXV*10; left=`${MAXV-fin}장 더 고르면 끝`; }
+  else { pct=100; left='모두 끝났어요'; }
+  pct=Math.min(100,Math.round(pct));
+  const msg = pct>=100 ? '투표 완료! 고마워요 💐' : pct>=90 ? '마지막 단계예요! ✨' : pct>=70 ? '거의 다 왔어요 🏃' : pct>=50 ? '반 넘었어요! 🎉' : pct>=25 ? '잘하고 있어요 👏' : pct>=5 ? '시작이 반이에요 🌱' : '천천히 시작해 볼까요? 😊';
+  $('#cheerFill').style.width=pct+'%'; $('#cheerPct').textContent=pct+'%'; $('#cheerLeft').textContent='· '+left; $('#cheerMsg').textContent='· '+msg;
+}
 /* ---------- zoomable viewer ---------- */
 class Zoom{
   constructor(box, opt={}){
@@ -534,168 +741,36 @@ class Zoom{
 }
 function link(a,b){ a.peers=b.peers=[a,b]; }
 
-function showImg(box, n, zoom){
+function showImg(box, n, zoom, keepZoom){
   const img=box.querySelector('img'); box.querySelector('.err')?.remove();
   img.onerror = () => { if(!box.querySelector('.err')){ const d=document.createElement('div'); d.className='err'; d.textContent='사진을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.'; box.appendChild(d);} };
   img.src = fullURL(n);
   const tag=box.querySelector('.tag'); if(tag) tag.textContent=n;
-  zoom.reset();
-}
-
-/* ---------- stage 1 ---------- */
-const s1box=$('#s1box');
-const z1=new Zoom(s1box,{ swipe:d=>decide(d>0?1:0), drag:dx=>{
-  s1box.style.transition=dx?'none':'transform .2s';
-  s1box.style.transform=dx?`translateX(${dx}px) rotate(${dx/30}deg)`:'';
-  s1box.querySelector('.like').style.opacity=Math.max(0,Math.min(1,dx/100));
-  s1box.querySelector('.nope').style.opacity=Math.max(0,Math.min(1,-dx/100));
-}});
-let s1cur=null;
-const likes = () => names.filter(n=>st.s1[n]===1);
-function renderS1(){
-  const i=names.findIndex(n=>!(n in st.s1));
-  const seen=names.length-names.filter(n=>!(n in st.s1)).length;
-  if(i<0){
-    s1cur=null; show('s1done');
-    $('#s1done h2').textContent=`${names.length.toLocaleString()}장 다 봤어요`;
-    $('#s1doneTxt').textContent=`좋아요 ${likes().length}장. 이제 비슷한 사진끼리 비교해서 줄여요.`;
-    return;
-  }
-  show('s1'); s1cur=names[i];
-  s1box.style.transition='none'; s1box.style.transform=''; s1box.querySelectorAll('.stamp').forEach(s=>s.style.opacity=0);
-  showImg(s1box,s1cur,z1);
-  preload(names[i+1]); preload(names[i+2]);
-  $('#s1count').textContent=`${seen.toLocaleString()} / ${names.length.toLocaleString()}`;
-  $('#s1likes').textContent=likes().length;
-  $('#s1prog').style.width=(seen/names.length*100)+'%';
-  $('#s1undo').disabled=!st.s1hist.length;
-}
-function decide(v){
-  if(!s1cur) return;
-  const n=s1cur; s1cur=null;
-  st.s1[n]=v; st.s1hist.push(n); save();
-  if(reduce){ renderS1(); return; }
-  s1box.querySelector(v?'.like':'.nope').style.opacity=1;
-  s1box.style.transition='transform .18s ease-in';
-  s1box.style.transform=`translateX(${v?120:-120}%) rotate(${v?12:-12}deg)`;
-  setTimeout(renderS1,170);
-}
-function undo1(){ const n=st.s1hist.pop(); if(n===undefined) return; delete st.s1[n]; save(); renderS1(); }
-$('#s1yes').onclick=()=>decide(1); $('#s1no').onclick=()=>decide(0);
-$('#s1undo').onclick=undo1; $('#s1back').onclick=undo1;
-$('#s1skip').onclick=()=>go('s2');
-
-/* ---------- stage 2 ---------- */
-const z2a=new Zoom($('#s2a'),{sync:()=>$('#sync').checked}), z2b=new Zoom($('#s2b'),{sync:()=>$('#sync').checked}); link(z2a,z2b);
-function startS2(pool, round){
-  pool=pool.filter(n=>photos.has(n));
-  st.s2={ queue:pool.slice(1), champ:pool[0]||null, kept:[], hist:[], round:round||1, total:Math.max(0,pool.length-1), done:pool.length<2 };
-  if(st.s2.done){ st.s2.kept=pool.slice(); st.s2.champ=null; }
-  save();
-}
-function survivors(){ const s=st.s2; if(!s) return likes(); return [...s.kept, ...(s.champ?[s.champ]:[]), ...s.queue]; }
-function renderS2(){
-  if(!st.s2) startS2(likes());
-  const s=st.s2;
-  if(s.done){
-    show('s2done');
-    $('#s2doneH').textContent=`${s.kept.length}장이 남았어요`;
-    $('#s2doneTxt').textContent = s.kept.length>40 ? '아직 많다면 한 번 더 비교해 보세요. 이번엔 다른 장면끼리도 붙게 돼요.' : `이제 최종 ${maxN()}장을 고를 차례예요.`;
-    $('#s2again').hidden = s.kept.length<3;
-    return;
-  }
-  show('s2');
-  showImg($('#s2a'),s.champ,z2a); showImg($('#s2b'),s.queue[0],z2b);
-  $('#s2a .flipimg').src=fullURL(s.queue[0]);
-  flipShow='A'; updateFlip();
-  preload(s.queue[1]);
-  $('#s2round').textContent=s.round;
-  $('#s2left').textContent=s.queue.length;
-  $('#s2kept').textContent=survivors().length;
-  $('#s2prog').style.width=(s.total? (s.total-s.queue.length)/s.total*100 : 100)+'%';
-  $('#s2undo').disabled=!s.hist.length;
-}
-function pick(w){
-  const s=st.s2; if(!s || s.done || !s.queue.length) return;
-  s.hist.push({champ:s.champ, keptLen:s.kept.length, next:s.queue[0]});
-  if(w==='L') s.queue.shift();
-  else if(w==='R') s.champ=s.queue.shift();
-  else { s.kept.push(s.champ); s.champ=s.queue.shift(); }
-  if(!s.queue.length){ s.kept.push(s.champ); s.champ=null; s.done=true; }
-  save(); renderS2();
-}
-function undo2(){
-  const s=st.s2; const h=s&&s.hist.pop(); if(!h) return;
-  if(s.done){ s.done=false; s.kept.pop(); }
-  s.kept.length=h.keptLen; s.champ=h.champ; s.queue.unshift(h.next); save(); renderS2();
-}
-$('#s2l').onclick=()=>pick('L'); $('#s2r').onclick=()=>pick('R'); $('#s2both').onclick=()=>pick('B'); $('#s2undo').onclick=undo2;
-$('#s2again').onclick=()=>{ startS2(st.s2.kept,(st.s2.round||1)+1); renderS2(); };
-$('#s2restart').onclick=()=>{ startS2(likes()); renderS2(); };
-$('#sync').onchange=()=>{ z2a.reset(); };
-
-/* ---------- flip (A/B in one frame) ---------- */
-// phones: one big photo at a time by default (two stacked photos get too small)
-let flipOn=(()=>{ try{ const v=localStorage.getItem('wed20-flip'); if(v!==null) return v==='1'; }catch(e){} return matchMedia('(max-width:700px)').matches; })(), flipShow='A';
-z2a.opt.tap=()=>{ if(flipOn){ flipShow=flipShow==='A'?'B':'A'; updateFlip(); } };
-function pair(){ const s=st.s2; return s&&!s.done ? {A:s.champ, B:s.queue[0]} : null; }
-function updateFlip(){
-  const p=pair(); const a=$('#s2a'), imgs=a.querySelectorAll('img');
-  $('.duel').classList.toggle('flip',flipOn); $('#s2b').hidden=flipOn;
-  $('#flipBtn').setAttribute('aria-pressed',flipOn); $('#flipBtn').textContent=flipOn?'두 장 같이 보기':'한 장씩 크게 보기';
-  $('#flipSwap').hidden=!flipOn; $('#syncWrap').hidden=flipOn;
-  const showB=flipOn&&flipShow==='B';
-  imgs[0].hidden=showB; imgs[1].hidden=!showB;
-  a.querySelector('.ab').textContent=showB?'B':'A'; a.classList.toggle('showb',showB);
-  if(p) a.querySelector('.tag').textContent=showB?p.B:p.A;
-  $('#flipNow').textContent=flipShow;
-}
-$('#flipBtn').onclick=()=>{ flipOn=!flipOn; flipShow='A'; try{ localStorage.setItem('wed20-flip',flipOn?'1':'0'); }catch(e){} updateFlip(); };
-$('#flipSwap').onclick=()=>{ flipShow=flipShow==='A'?'B':'A'; updateFlip(); };
-
-/* ---------- review: bring back passed or dropped photos ---------- */
-let revFrom='s1', revKind='s1';
-document.addEventListener('click', e=>{ const b=e.target.closest('[data-open-rev]'); if(!b) return; revFrom=st.stage||'s1'; revKind=b.dataset.openRev; renderReview(); });
-document.querySelectorAll('[data-rev]').forEach(b=>b.onclick=()=>{ revKind=b.dataset.rev; renderReview(); });
-$('#revBack').onclick=()=>go(revFrom);
-function renderReview(){
-  show('review');
-  const surv=new Set(survivors());
-  const passed=names.filter(n=>st.s1[n]===0);
-  const dropped=likes().filter(n=>!surv.has(n));
-  if(!st.s2) revKind='s1';
-  $('#revN1').textContent=passed.length; $('#revN2').textContent=dropped.length;
-  $('[data-rev="s2"]').hidden=!st.s2;
-  document.querySelectorAll('[data-rev]').forEach(b=>b.classList.toggle('main',b.dataset.rev===revKind));
-  const list = revKind==='s1' ? passed : dropped;
-  grid($('#revGrid'), list, new Set(), null, (n,on)=>rescue(n,on), Infinity);
-  if(!list.length) $('#revGrid').textContent='여기에 해당하는 사진이 없어요.';
-}
-function rescue(n,on){
-  if(revKind==='s1') st.s1[n]=on?1:0;
-  const s=st.s2;
-  if(s){
-    if(on){ if(!s.kept.includes(n) && s.champ!==n && !s.queue.includes(n)) s.kept.push(n); }
-    else { s.kept=s.kept.filter(x=>x!==n); s.queue=s.queue.filter(x=>x!==n); }
-  }
-  save(); toast(on?'다시 후보로 살렸어요':'다시 뺐어요');
+  if(!keepZoom) zoom.reset();
+  const old=box.querySelector('.aitags'); if(old) old.remove();
+  const t=tagEl(n); if(t) box.append(t);
 }
 
 /* ---------- navigation ---------- */
-const screens=['login','loading','empty','s1','s1done','s2','s2done','s3','review','gallery','admin'];
+const screens=['login','loading','empty','pick','pickdone','scene','sort','sortdone','final','all','gallery','admin'];
+let curScreen='login';
 function show(id){
+  curScreen=id;
   for(const s of screens) $('#'+s).hidden = (s!==id);
   const step=id.replace('done','');
-  document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-current', b.dataset.go===step));
-  paintMax();
+  const navKey = id==='all' ? allStep : step;
+  document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-current', b.dataset.go===navKey));
+  paintMax(); cheer();
+  if(id!=='admin') stopLive();
 }
 function go(stage){
   if(!token) return show('login');
-  if(['s1','s2','s3'].includes(stage) && !names.length){ show('empty'); return; }
-  if(['s1','s2','s3'].includes(stage) && st.stage!==stage){ st.stage=stage; save(); }
-  if(stage==='s1') renderS1();
-  else if(stage==='s2') renderS2();
-  else if(stage==='s3') renderS3();
+  if(STEPS.includes(stage) && !order.length){ show('empty'); return; }
+  if(STEPS.includes(stage) && st.stage!==stage){ st.stage=stage; save(); }
+  if(stage==='pick') renderPick();
+  else if(stage==='scene') renderScene();
+  else if(stage==='sort') renderSort();
+  else if(stage==='final') renderFinal();
   else if(stage==='gallery') renderGallery();
   else if(stage==='admin') renderAdmin();
   else show(stage);
@@ -718,122 +793,400 @@ $('#loginForm').addEventListener('submit', async e=>{
     try{ localStorage.setItem(AUTH, JSON.stringify({token, name:d.name})); }catch(e){}
     $('#lPw').value='';
     await loadAll();
-  }catch(err){ $('#lErr').textContent=err.message; }
+  }catch(err){ if(err.message!=='signed-out') $('#lErr').textContent = /암호/.test(err.message) ? '암호가 맞지 않아요. 카톡으로 받은 암호를 다시 확인해 주세요.' : err.message; }
   finally{ $('#lBtn').disabled=false; }
 });
 function signOut(msg){
-  token=null; me=null; st=fresh(); names=[]; photos=new Map();
+  token=null; me=null; st=fresh(); order=[]; units=[]; photos=new Map();
   try{ localStorage.removeItem(AUTH); }catch(e){}
   $('#nav').hidden=true; $('#whoBox').hidden=true; closeLB();
   show('login'); if(msg) $('#lErr').textContent=msg;
 }
 $('#logout').onclick=async()=>{ await flush(); signOut(); };
-$('#brandBtn').onclick=()=>{ if(token) go(st.stage||'s1'); };
+$('#brandBtn').onclick=()=>{ if(token) go(st.stage||'pick'); };
 
+let votePw='', adminPw='';
 async function loadAll(){
   show('loading');
   const d=await api('data');
   me={role:d.role, name:d.name}; MAXV=d.max||20;
-  photos=new Map(d.photos.map(p=>[p.name,p])); names=[...photos.keys()].sort(cmp);
+  votePw=d.votePw||''; adminPw=d.adminPw||'';
+  photos=new Map(d.photos.map(p=>[p.name,p]));
+  buildOrder();
   let local=null; try{ local=JSON.parse(localStorage.getItem(localKey())); }catch(e){}
   const server=d.me?.state;
-  st = Object.assign(fresh(), (server && Object.keys(server).length) ? server : (local||{}));
-  st.s3 = (st.s3||[]).filter(n=>photos.has(n));
-  invitePw = d.invitePw || '';
+  st = migrate((server && Object.keys(server).length) ? server : local);
+  st.final = (st.final||[]).filter(n=>photos.has(n));
   $('#nav').hidden=false; $('#navAdmin').hidden=me.role!=='admin'; $('#emptyAdmin').hidden=me.role!=='admin';
   $('#whoBox').hidden=false; $('#whoName').textContent=me.name+(me.role==='admin'?' (관리자)':''); setSync('');
-  if(!names.length) return me.role==='admin' ? go('admin') : show('empty');
-  go(st.stage||'s1');
+  if(!order.length) return me.role==='admin' ? go('admin') : show('empty');
+  go(STEPS.includes(st.stage) ? st.stage : 'pick');
 }
 $('#emptyReload').onclick=()=>loadAll().catch(e=>{ if(e.message!=='signed-out') toast(e.message); });
 
-/* ---------- grid (stage 3 + review) ---------- */
-function grid(el, list, sel, badge, onChange, max){
+/* ---------- photo tiles ---------- */
+// opts: {on:n=>bool, toggle:n=>void, badge:n=>[cls,text]|null, check:{has,toggle}, lbAct:{label,on,toggle}}
+function tiles(el, list, opts={}){
   el.innerHTML='';
-  const tiles=new Map();
-  const toggle=n=>{
-    if(sel.has(n)) sel.delete(n);
-    else { const lim=max??maxN(); if(sel.size>=lim){ toast(`${lim}장이 다 찼어요. 하나를 빼고 넣어 주세요.`); return false; } sel.add(n); }
-    tiles.get(n)?.classList.toggle('on', sel.has(n)); onChange(n, sel.has(n)); return true;
-  };
-  const viewable=list.filter(x=>photos.has(x));
-  list.forEach(n=>{
-    const t=document.createElement('div'); t.className='tile'+(sel.has(n)?' on':''); tiles.set(n,t);
+  const map=new Map();
+  const viewable=list.filter(n=>photos.has(n));
+  for(const n of list){
+    const t=document.createElement('div'); t.className='tile'; map.set(n,t);
     if(photos.has(n)){ const img=document.createElement('img'); img.alt=n; img.loading='lazy'; img.decoding='async'; img.src=fullURL(n); t.append(img); }
     else { const m=document.createElement('div'); m.className='missing'; m.textContent=n+' (지워진 사진)'; t.append(m); }
     const nm=document.createElement('div'); nm.className='nm'; nm.textContent=n; t.append(nm);
-    const b=badge&&badge(n); if(b){ const s=document.createElement('span'); s.className='badge '+(b.cls||''); s.textContent=b.text; t.append(s); }
-    const h=document.createElement('button'); h.className='heart'; h.textContent='♥'; h.setAttribute('aria-label',n+' 선택');
-    h.onclick=e=>{ e.stopPropagation(); toggle(n); };
-    t.append(h);
-    t.onclick=()=>{ if(photos.has(n)) openLB(viewable, n, sel, toggle); };
+    const tg=tagEl(n); if(tg) t.append(tg);
+    if(opts.badge){ const b=opts.badge(n); if(b){ const s=document.createElement('span'); s.className='badge '+b[0]; s.textContent=b[1]; t.append(s); } }
+    if(opts.toggle){
+      const h=document.createElement('button'); h.className='heart'; h.textContent='♥'; h.setAttribute('aria-label',n+' 고르기');
+      h.onclick=e=>{ e.stopPropagation(); opts.toggle(n); paint(); }; t.append(h);
+    }
+    if(opts.check){
+      const c=document.createElement('button'); c.className='ck'; c.setAttribute('aria-label',n+' 선택');
+      c.onclick=e=>{ e.stopPropagation(); opts.check.toggle(n); paint(); }; t.append(c);
+    }
+    t.onclick=()=>{ if(photos.has(n)) openLB(viewable, n, opts.lbAct||(opts.toggle?{label:on=>on?'♥ 고름':'♡ 고르기', on:opts.on, toggle:n2=>{opts.toggle(n2); paint();}}:null)); };
     el.append(t);
-  });
+  }
+  function paint(){ for(const [n,t] of map){ t.classList.toggle('on', !!opts.on?.(n)); t.classList.toggle('picked', !!opts.check?.has(n)); } opts.after?.(); }
+  paint();
+  return paint;
 }
 
-function renderS3(){
-  show('s3');
-  const pool=survivors();
-  const sel=new Set(st.s3);
-  const extra=[...sel].filter(n=>!pool.includes(n));
+/* ---------- step 1: pick ---------- */
+const s1box=$('#s1box');
+const z1=new Zoom(s1box,{ swipe:d=>decide(d>0?1:0), drag:dx=>{
+  s1box.style.transition=dx?'none':'transform .2s';
+  s1box.style.transform=dx?`translateX(${dx}px) rotate(${dx/30}deg)`:'';
+  s1box.querySelector('.like').style.opacity=Math.max(0,Math.min(1,dx/100));
+  s1box.querySelector('.nope').style.opacity=Math.max(0,Math.min(1,-dx/100));
+}});
+let s1cur=null, gUnit=-1, gSel=new Set();
+const curUnit = () => units.findIndex(u=>u.some(n=>!(n in st.s1)));
+function pickHead(){
+  const seen=order.filter(n=>n in st.s1).length;
+  $('#pCount').textContent=`${seen.toLocaleString()} / ${order.length.toLocaleString()}`;
+  $('#pLikes').textContent=liked().length;
+  $('#pUndo').disabled=$('#gUndo').disabled=!st.s1hist.length;
+}
+function renderPick(){
+  const i=curUnit();
+  if(i<0){
+    s1cur=null; show('pickdone');
+    $('#pdH').textContent=`${order.length.toLocaleString()}장을 다 봤어요! 🎉`;
+    $('#pdTxt').textContent=`♥ ${liked().length}장을 골랐어요. 이제 장면별로 꼭 넣고 싶은 사진을 골라 볼게요.`;
+    return;
+  }
+  show('pick'); pickHead();
+  const u=units[i];
+  if(u.length===1){
+    $('#pSingle').hidden=false; $('#pGroup').hidden=true;
+    s1cur=u[0];
+    s1box.style.transition='none'; s1box.style.transform=''; s1box.querySelectorAll('.stamp').forEach(s=>s.style.opacity=0);
+    showImg(s1box,s1cur,z1);
+    const nx=units[i+1]; if(nx) nx.slice(0,2).forEach(preload);
+  } else {
+    s1cur=null; $('#pSingle').hidden=true; $('#pGroup').hidden=false;
+    if(gUnit!==i){ gUnit=i; gSel=new Set(u.filter(n=>st.s1[n]===1)); }
+    $('#gCount').textContent=u.length;
+    tiles($('#gGrid'), u, { on:n=>gSel.has(n), toggle:n=>{ gSel.has(n)?gSel.delete(n):gSel.add(n); },
+      after:()=>{ $('#gKeep').textContent = gSel.size ? `♥ ${gSel.size}장 남기고 다음 →` : '♥ 고른 것 남기고 다음 →'; } });
+  }
+}
+function decideUnit(names, keep){
+  for(const n of names) st.s1[n]=keep.has(n)?1:0;
+  st.s1hist.push(names); gUnit=-1; save(); renderPick();
+}
+function decide(v){
+  if(!s1cur) return;
+  const n=s1cur; s1cur=null;
+  st.s1[n]=v; st.s1hist.push([n]); save();
+  if(reduce){ renderPick(); return; }
+  s1box.querySelector(v?'.like':'.nope').style.opacity=1;
+  s1box.style.transition='transform .18s ease-in';
+  s1box.style.transform=`translateX(${v?120:-120}%) rotate(${v?12:-12}deg)`;
+  setTimeout(renderPick,170);
+}
+function undo1(){ const h=st.s1hist.pop(); if(!h) return; for(const n of h) delete st.s1[n]; gUnit=-1; save(); renderPick(); }
+$('#pYes').onclick=()=>decide(1); $('#pNo').onclick=()=>decide(0);
+$('#pUndo').onclick=undo1; $('#gUndo').onclick=undo1; $('#pdUndo').onclick=undo1;
+$('#gNone').onclick=()=>{ const u=units[curUnit()]; if(u) decideUnit(u,new Set()); };
+$('#gKeep').onclick=()=>{ const u=units[curUnit()]; if(u) decideUnit(u,gSel); };
+
+/* ---------- step 2: scenes ---------- */
+function fmtTime(n){ const t=tms(photos.get(n)); if(t==null) return ''; const d=new Date(t); const h=d.getUTCHours(), m=String(d.getUTCMinutes()).padStart(2,'0'); return `${h<12?'오전':'오후'} ${h%12||12}:${m}`; }
+function renderScene(){
+  const sc=scenes();
+  if(!sc.length){ show('scene'); $('#scTitle').textContent='1단계에서 ♥ 누른 사진이 없어요'; $('#scGrid').innerHTML=''; $('#scInfo').textContent=''; $('#scNext').disabled=true; $('#scPrev').disabled=true; return; }
+  if(autoScenes(sc)) save();
+  st.sceneIdx=Math.max(0,Math.min(st.sceneIdx||0, sc.length-1));
+  show('scene');
+  const i=st.sceneIdx, s=sc[i];
+  const done=sc.filter(x=>scenePicked(x)>=SCENE_MIN).length;
+  $('#scInfo').textContent=`장면 ${done} / ${sc.length}개 완료`;
+  const t1=fmtTime(s[0]), t2=fmtTime(s[s.length-1]);
+  $('#scTitle').textContent=`장면 ${i+1} / ${sc.length}${t1?` · ${t1}${t2&&t2!==t1?` ~ ${t2}`:''}`:''} · 사진 ${s.length}장`;
+  $('#scPrev').disabled=i===0;
+  const paint=tiles($('#scGrid'), s, {
+    on:n=>st.scene[n]===1,
+    toggle:n=>{ if(st.scene[n]===1){ delete st.scene[n]; } else { if(scenePicked(s)>=SCENE_MAX){ toast(`이 장면에서는 ${SCENE_MAX}장까지 고를 수 있어요. 다른 사진의 ♥를 먼저 빼 주세요.`); return; } st.scene[n]=1; } save(); },
+    after:()=>{
+      const k=scenePicked(s); $('#scN').textContent=k; $('#scC').classList.toggle('over',k<SCENE_MIN);
+      const last=i===sc.length-1, allDone=sc.every(x=>scenePicked(x)>=SCENE_MIN);
+      $('#scNext').disabled = k<SCENE_MIN;
+      $('#scNext').textContent = k<SCENE_MIN ? `최소 ${SCENE_MIN}장을 골라 주세요` : last ? (allDone?'3단계 시작하기 →':'안 끝난 장면으로 →') : '다음 장면 →';
+      $('#scInfo').textContent=`장면 ${sc.filter(x=>scenePicked(x)>=SCENE_MIN).length} / ${sc.length}개 완료`;
+      cheer();
+    }});
+  void paint;
+}
+$('#scPrev').onclick=()=>{ st.sceneIdx=Math.max(0,(st.sceneIdx||0)-1); save(); renderScene(); $('#scGrid').parentElement.scrollTop=0; };
+$('#scNext').onclick=()=>{
+  const sc=scenes(), i=st.sceneIdx||0;
+  if(i<sc.length-1){ st.sceneIdx=i+1; }
+  else { const j=sc.findIndex(x=>scenePicked(x)<SCENE_MIN); if(j<0){ save(); return go('sort'); } st.sceneIdx=j; }
+  save(); renderScene(); $('#scGrid').parentElement.scrollTop=0;
+};
+
+/* ---------- step 3: sort into three ---------- */
+const soBox=$('#soBox'); const zSo=new Zoom(soBox,{});
+let soCur=null;
+function renderSort(){
+  const it=sortItems();
+  const cnt=k=>it.filter(n=>st.bucket[n]===k).length;
+  const next=it.find(n=>!st.bucket[n]);
+  if(!it.length){ show('sort'); soCur=null; $('#soCount').textContent='0 / 0'; soBox.querySelector('img').removeAttribute('src'); toast('2단계에서 고른 사진이 없어요.'); return; }
+  if(!next){ show('sortdone'); $('#sdTxt').textContent=`💚 꼭 넣기 ${cnt('must')}장 · 🤔 고민 ${cnt('maybe')}장 · ✕ 빼기 ${cnt('out')}장. 이제 최종 ${MAXV}장만 고르면 돼요.`; return; }
+  show('sort'); soCur=next;
+  const done=it.filter(n=>st.bucket[n]).length;
+  $('#soCount').textContent=`${done} / ${it.length}`;
+  $('#soMust').textContent=cnt('must'); $('#soMaybe').textContent=cnt('maybe'); $('#soOut').textContent=cnt('out');
+  $('#soUndo').disabled=!st.bucketHist.length;
+  showImg(soBox,next,zSo);
+  const after=it[it.indexOf(next)+1]; if(after) preload(after);
+}
+function bucket(k){ if(!soCur) return; st.bucket[soCur]=k; st.bucketHist.push(soCur); soCur=null; save(); renderSort(); }
+function undo3(){ const n=st.bucketHist.pop(); if(n===undefined) return; delete st.bucket[n]; save(); renderSort(); }
+$('#soM').onclick=()=>bucket('must'); $('#soY').onclick=()=>bucket('maybe'); $('#soX').onclick=()=>bucket('out');
+$('#soUndo').onclick=undo3; $('#sdUndo').onclick=undo3;
+
+/* ---------- step 4: final vote ---------- */
+function renderFinal(){
+  const pool=finalPool();
+  if(!st.finalInit && pool.length){ st.final=pool.filter(n=>st.bucket[n]==='must').slice(0,MAXV); st.finalInit=true; save(); }
+  const extra=st.final.filter(n=>!pool.includes(n));
   const list=[...pool, ...extra];
-  $('#s3pool').textContent=list.length;
-  const upd=()=>{ st.s3=[...sel]; save(); $('#s3n').textContent=sel.size; $('#s3c').classList.toggle('over',sel.size>maxN()); };
-  grid($('#s3grid'), list, sel, null, upd);
-  $('#s3n').textContent=sel.size; $('#s3c').classList.toggle('over',sel.size>maxN());
+  show('final');
+  $('#fPool').textContent=list.length;
+  const must=pool.filter(n=>st.bucket[n]==='must').length;
+  $('#fNotice').hidden = must<=MAXV;
+  $('#fNotice').textContent = `💚 꼭 넣기가 ${must}장이라 ${MAXV}장을 넘어요. 몇 장의 ♥를 빼고 골라 주세요.`;
+  const sel=new Set(st.final);
+  tiles($('#fGrid'), list, {
+    on:n=>sel.has(n),
+    badge:n=>st.bucket[n]==='must'?['must','💚 꼭']:st.bucket[n]==='maybe'?['maybe','🤔 고민']:null,
+    toggle:n=>{ if(sel.has(n)) sel.delete(n); else { if(sel.size>=MAXV){ toast(`${MAXV}장을 다 골랐어요. 바꾸려면 다른 사진의 ♥를 먼저 빼 주세요.`); return; } sel.add(n); } st.final=[...sel]; save(); },
+    after:()=>{ $('#fN').textContent=sel.size; $('#fC').classList.toggle('over',sel.size>MAXV); }
+  });
+  if(!list.length) $('#fGrid').textContent='3단계에서 💚 꼭 넣기나 🤔 고민으로 나눈 사진이 여기에 모여요.';
+}
+$('#impOpen').onclick=()=>{ $('#impBox').hidden=!$('#impBox').hidden; };
+$('#impClose').onclick=()=>{ $('#impBox').hidden=true; };
+$('#impDo').onclick=()=>{
+  const lower=new Map([...photos.keys()].map(n=>[n.toLowerCase(),n]));
+  const base=new Map([...photos.keys()].map(n=>[n.toLowerCase().replace(/\.[^.]+$/,''),n]));
+  let found=0, miss=0;
+  for(const raw of $('#impText').value.split(/\r?\n/)){
+    const l=raw.trim(); if(!l || l.startsWith('[')) continue;
+    const n=lower.get(l.toLowerCase()) || base.get(l.toLowerCase().replace(/\.[^.]+$/,''));
+    if(!n){ miss++; continue; }
+    st.s1[n]=1; st.scene[n]=1; st.bucket[n]='must';
+    if(!st.final.includes(n) && st.final.length<MAXV) st.final.push(n);
+    found++;
+  }
+  st.finalInit=true; save();
+  $('#impBox').hidden=true; $('#impText').value='';
+  toast(found ? `${found}장을 가져와서 ♥를 켰어요.`+(miss?` (못 찾은 이름 ${miss}개)`:'') : '붙여넣은 글에서 사진 이름을 찾지 못했어요.', 4000);
+  renderFinal();
+};
+
+/* ---------- every photo of a step: review, bring back, change in bulk ---------- */
+let allStep='pick', allFilter='all', allSelSet=new Set(), allFrom='pick';
+const ALL = {
+  pick: { title:'1단계 전체 사진', pool:()=>order,
+    status:n=>st.s1[n]===1?'in':st.s1[n]===0?'out':'none',
+    labels:{in:'♥ 고른 사진', out:'✕ 넘긴 사진', none:'아직 안 본 사진'},
+    acts:[['in','♥로 바꾸기'],['out','✕로 바꾸기']],
+    bulk:['out','in','넘긴 사진 모두 ♥로 되돌리기'],
+    set:(n,k)=>{ st.s1[n]= k==='in'?1:0; } },
+  scene: { title:'2단계 전체 사진 (1단계에서 ♥ 누른 사진)', pool:()=>liked(),
+    status:n=>st.scene[n]===1?'in':'out',
+    labels:{in:'♥ 고른 사진', out:'빠진 사진'},
+    acts:[['in','♥로 바꾸기'],['out','빼기']],
+    bulk:['out','in','빠진 사진 모두 ♥로 되돌리기'],
+    set:(n,k)=>{ if(k==='in') st.scene[n]=1; else delete st.scene[n]; } },
+  sort: { title:'3단계 전체 사진 (2단계에서 고른 사진)', pool:()=>sortItems(),
+    status:n=>st.bucket[n]||'none',
+    labels:{must:'💚 꼭 넣기', maybe:'🤔 고민', out:'✕ 빼기', none:'아직 안 나눈 사진'},
+    acts:[['must','💚 꼭 넣기로'],['maybe','🤔 고민으로'],['out','✕ 빼기로']],
+    bulk:['out','maybe','뺀 사진 모두 🤔 고민으로 되돌리기'],
+    set:(n,k)=>{ st.bucket[n]=k; } },
+  final: { title:'4단계 전체 사진 (💚·🤔 사진)', pool:()=>{ const p=finalPool(); return [...p, ...st.final.filter(n=>!p.includes(n))]; },
+    status:n=>st.final.includes(n)?'in':'out',
+    labels:{in:'♥ 최종으로 고른 사진', out:'안 고른 사진'},
+    acts:[['in','♥ 고르기'],['out','♥ 빼기']],
+    bulk:null,
+    set:(n,k)=>{ if(k==='in'){ if(!st.final.includes(n)){ if(st.final.length>=MAXV) return false; st.final.push(n); } } else st.final=st.final.filter(x=>x!==n); st.finalInit=true; } },
+};
+document.addEventListener('click', e=>{ const b=e.target.closest('[data-all]'); if(!b) return; openAll(b.dataset.all); });
+function openAll(step){ allFrom=curScreen==='all'?allFrom:(st.stage||'pick'); allStep=step; allFilter='all'; allSelSet=new Set(); renderAll(); }
+$('#allBack').onclick=()=>go(allFrom);
+function renderAll(){
+  const A=ALL[allStep]; show('all');
+  $('#allTitle').textContent=A.title+' · 사진을 선택해서 한 번에 바꿀 수 있어요';
+  const pool=A.pool();
+  const keys=Object.keys(A.labels);
+  const chips=$('#allChips'); chips.innerHTML='';
+  const mk=(k,txt,n)=>{ const b=document.createElement('button'); b.className='chipbtn'+(allFilter===k?' on':''); b.textContent=`${txt} ${n}`; b.onclick=()=>{ allFilter=k; allSelSet=new Set(); renderAll(); }; chips.append(b); };
+  mk('all','전체',pool.length);
+  for(const k of keys) mk(k,A.labels[k],pool.filter(n=>A.status(n)===k).length);
+  const list = allFilter==='all' ? pool : pool.filter(n=>A.status(n)===allFilter);
+  const badgeTxt={in:'♥',out:'✕',none:'·',must:'💚',maybe:'🤔'};
+  tiles($('#allGrid'), list, {
+    badge:n=>{ const s=A.status(n); return [s, badgeTxt[s]+' '+A.labels[s].replace(/^\S+\s/,'').replace(' 사진','')]; },
+    check:{ has:n=>allSelSet.has(n), toggle:n=>{ allSelSet.has(n)?allSelSet.delete(n):allSelSet.add(n); } },
+    lbAct:{ label:on=>on?'✓ 선택됨':'선택하기', on:n=>allSelSet.has(n), toggle:n=>{ allSelSet.has(n)?allSelSet.delete(n):allSelSet.add(n); paintSel(); } },
+    after:paintSel
+  });
+  if(!list.length) $('#allGrid').textContent='여기에 해당하는 사진이 없어요.';
+  function paintSel(){
+    $('#allSelN').textContent = allSelSet.size ? `${allSelSet.size}장 선택됨` : '사진 오른쪽 위 동그라미를 눌러 선택하세요';
+    const acts=$('#allActs'); acts.innerHTML='';
+    const btn=(t,cls,fn)=>{ const b=document.createElement('button'); b.className='btn small '+cls; b.textContent=t; b.onclick=fn; acts.append(b); };
+    if(list.length) btn(allSelSet.size===list.length?'선택 해제':'모두 선택','ghost',()=>{ allSelSet = allSelSet.size===list.length ? new Set() : new Set(list); renderAll(); });
+    if(allSelSet.size) for(const [k,t] of A.acts) btn(t,'',()=>applyAll([...allSelSet],k));
+    if(A.bulk){ const [from,to,t]=A.bulk; const c=pool.filter(n=>A.status(n)===from).length; if(c) btn(`${t} (${c}장)`,'main',()=>applyAll(pool.filter(n=>A.status(n)===from),to)); }
+  }
+}
+function applyAll(names,k){
+  const A=ALL[allStep]; let skipped=0;
+  for(const n of names) if(A.set(n,k)===false) skipped++;
+  save(); allSelSet=new Set(); renderAll();
+  toast(`${names.length-skipped}장을 바꿨어요.`+(skipped?` ${MAXV}장이 다 차서 ${skipped}장은 못 넣었어요.`:''));
 }
 
-/* ---------- gallery: everyone's votes ---------- */
-let galTop=[];
+/* ---------- results ---------- */
+let galTop=[], galMode='score', galData=null;
+const STEP_TXT={pick:'1단계',scene:'2단계',sort:'3단계',final:'4단계'};
 async function renderGallery(){
   show('gallery');
   $('#galInfo').textContent='불러오는 중…';
-  let d;
-  try{ await flush(); d=await api('results'); }catch(e){ if(e.message!=='signed-out') $('#galInfo').textContent=e.message; return; }
-  MAXV=d.max||MAXV; paintMax();
+  try{ await flush(); galData=await api('results'); }catch(e){ if(e.message!=='signed-out') $('#galInfo').textContent=e.message; return; }
+  MAXV=galData.max||MAXV; paintMax(); paintGallery();
+}
+function rankList(d){
+  return galMode==='final'
+    ? d.ranking.filter(p=>p.finals>0).sort((a,b)=>b.finals-a.finals||b.score-a.score||cmp(a.name,b.name))
+    : d.ranking;
+}
+function paintGallery(){
+  const d=galData; if(!d) return;
+  $('#galByScore').classList.toggle('on',galMode==='score'); $('#galByFinal').classList.toggle('on',galMode==='final');
   const vs=$('#galVoters'); vs.innerHTML='';
-  if(!d.voters.length){ const c=document.createElement('span'); c.className='chip'; c.textContent='아직 아무도 고르지 않았어요'; vs.append(c); }
-  d.voters.forEach(v=>{
-    const c=document.createElement('span'); const full=v.count>=d.max;
-    c.className='chip'+(full?' done':''); c.textContent=`${v.name} ${full?'✓ ':''}${v.count}/${d.max}장`;
-    c.title=`1단계에서 ${v.seen}장 봄`; vs.append(c);
-  });
+  if(!d.voters.length){ const c=document.createElement('span'); c.className='chip'; c.textContent='아직 투표한 사람이 없어요'; vs.append(c); }
+  for(const v of d.voters){
+    const full=v.final>=d.max, c=document.createElement('span');
+    c.className='chip'+(full?' done':''); c.textContent = full ? `${v.name} ✓ 투표 완료` : `${v.name} · ${STEP_TXT[v.stage]||'1단계'} 진행 중`;
+    c.title=`1단계 ${v.seen}장 봄 · ♥ ${v.liked} · 최종 ${v.final}/${d.max}`; vs.append(c);
+  }
+  const R=rankList(d), key=galMode==='final'?'finals':'score';
+  for(const p of R) if(!photos.has(p.name)) photos.set(p.name,p);
   const g=$('#galGrid'); g.innerHTML='';
-  const list=d.ranking.map(p=>p.name);
-  d.ranking.forEach(p=>{ if(!photos.has(p.name)) photos.set(p.name,p); });
   let rank=0, prev=null;
-  d.ranking.forEach((p,i)=>{
-    if(p.votes!==prev){ rank=i+1; prev=p.votes; }
+  const names=R.map(p=>p.name);
+  R.forEach((p,i)=>{
+    if(p[key]!==prev){ rank=i+1; prev=p[key]; }
     const t=document.createElement('div'); t.className='tile'+(rank>d.max?' cut':'');
     const img=document.createElement('img'); img.alt=p.name; img.loading='lazy'; img.decoding='async'; img.src=p.url; t.append(img);
     const r=document.createElement('span'); r.className='rank'+(rank<=3?' top':''); r.textContent=rank+'위'; t.append(r);
-    const v=document.createElement('span'); v.className='votes'; v.textContent='♥ '+p.votes; t.append(v);
-    const nm=document.createElement('div'); nm.className='nm'; nm.textContent=p.by.join(', '); t.append(nm);
-    t.onclick=()=>openLB(list, p.name, null, null);
+    const v=document.createElement('span'); v.className='votes'; v.textContent = galMode==='final' ? `♥ ${p.finals}명` : `${p.score}점`; t.append(v);
+    const nm=document.createElement('div'); nm.className='nm'; nm.textContent=`최종 ♥ ${p.finals}명 · `+p.by.map(b=>b.name+(b.final?'♥':'')).join(', '); t.append(nm);
+    t.onclick=()=>openLB(names, p.name, null);
     g.append(t);
   });
-  if(!d.ranking.length){ g.textContent='아직 표가 없어요. 3단계에서 하트를 누르면 여기에 모여요.'; }
-  galTop=d.ranking.slice(0,d.max).map(p=>p.name);
-  const tie = d.ranking.length>d.max && d.ranking[d.max-1].votes===d.ranking[d.max].votes;
-  $('#galInfo').textContent = `${d.voters.length}명 참여 · 표 받은 사진 ${d.ranking.length}장` + (tie?` · ${d.max}위에 같은 표가 있어요`:'');
+  if(!R.length) g.textContent = galMode==='final' ? '아직 최종 투표한 사람이 없어요.' : '아직 투표한 사람이 없어요. 1단계에서 ♥를 누르면 점수가 쌓여요.';
+  galTop=R.slice(0,d.max).map(p=>p.name);
+  const tie = R.length>d.max && R[d.max-1][key]===R[d.max][key];
+  $('#galInfo').textContent = `${d.voters.length}명 참여 · 점수를 받은 사진 ${d.ranking.length}장` + (tie?` · ${d.max}위에 점수가 같은 사진이 있어요. 함께 보고 정해 주세요`:'');
 }
 $('#galRefresh').onclick=renderGallery;
+$('#galByScore').onclick=()=>{ galMode='score'; paintGallery(); };
+$('#galByFinal').onclick=()=>{ galMode='final'; paintGallery(); };
 function copy(text, ta){
-  const done=()=>toast('복사했어요. 카톡에 붙여넣기 하세요.');
+  const done=()=>toast('복사했어요. 카톡에 붙여넣으면 돼요.');
   const fallback=()=>{ ta.hidden=false; ta.value=text; ta.focus(); ta.select(); toast('선택된 글자를 길게 눌러 복사해 주세요.'); };
   try{ navigator.clipboard.writeText(text).then(done, fallback); }catch(e){ fallback(); }
 }
 $('#galCopy').onclick=()=>{
-  if(!galTop.length) return toast('아직 표가 없어요.');
-  copy(`[웨딩스냅 최종 셀렉] ${galTop.length}장\n`+galTop.slice().sort(cmp).join('\n'), $('#galCode'));
+  if(!galTop.length) return toast('아직 투표한 사람이 없어요.');
+  copy(`[웨딩스냅 최종 셀렉] ${galTop.length}장\n`+galTop.join('\n'), $('#galCode'));
+};
+function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=rej; document.head.append(s); }); }
+$('#galZip').onclick=async()=>{
+  if(!galTop.length) return toast('아직 투표한 사람이 없어요.');
+  const b=$('#galZip'); b.disabled=true;
+  try{
+    if(!window.JSZip) await loadScript('/vendor/jszip.min.js');
+    const zip=new JSZip(); let i=0, got=0;
+    for(const n of galTop){
+      i++; b.textContent=`사진을 모으는 중이에요 (${i} / ${galTop.length})`;
+      const url=photos.get(n)?.url; if(!url) continue;
+      let blob=null;
+      try{ const r=await fetch(url,{mode:'cors'}); if(r.ok) blob=await r.blob(); }catch(e){}
+      if(!blob){ try{ const r=await fetch('/api/file?u='+encodeURIComponent(url),{headers:{authorization:'Bearer '+token}}); if(r.ok) blob=await r.blob(); }catch(e){} }
+      if(blob){ zip.file(`${String(i).padStart(2,'0')}_${n}`, blob); got++; }
+    }
+    b.textContent='압축하는 중이에요…';
+    const out=await zip.generateAsync({type:'blob'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(out); a.download=`웨딩스냅_베스트${got}장.zip`;
+    document.body.append(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },10000);
+    toast(`${got}장을 압축파일로 저장했어요. 순위 번호가 파일 이름 앞에 붙어 있어요.`,4000);
+  }catch(e){ toast('압축파일을 만들지 못했어요. 잠시 뒤 다시 눌러 주세요.'); }
+  finally{ b.disabled=false; b.innerHTML=`상위 <span class="maxN">${MAXV}</span>장 사진 내려받기 (압축파일)`; }
 };
 
 /* ---------- admin ---------- */
-let invitePw='';
+let liveT=null;
+function stopLive(){ clearInterval(liveT); liveT=null; }
+async function paintLive(){
+  if(curScreen!=='admin') return stopLive();
+  let d; try{ d=await api('results'); }catch(e){ if(e.message!=='signed-out') $('#liveInfo').textContent=e.message; return; }
+  const top=d.ranking.slice(0,20);
+  for(const p of d.ranking) if(!photos.has(p.name)) photos.set(p.name,p);
+  const doneN=d.voters.filter(v=>v.final>=d.max).length;
+  $('#liveInfo').textContent = `${d.voters.length}명 참여 · 투표 완료 ${doneN}명 · ${new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})} 기준`;
+  const g=$('#liveGrid'); g.innerHTML='';
+  const names=top.map(p=>p.name);
+  let rank=0, prev=null;
+  top.forEach((p,i)=>{
+    if(p.score!==prev){ rank=i+1; prev=p.score; }
+    const t=document.createElement('div'); t.className='tile';
+    const img=document.createElement('img'); img.alt=p.name; img.loading='lazy'; img.src=p.url; t.append(img);
+    const r=document.createElement('span'); r.className='rank'+(rank<=3?' top':''); r.textContent=rank+'위'; t.append(r);
+    const v=document.createElement('span'); v.className='votes'; v.textContent=p.score+'점'; t.append(v);
+    t.onclick=()=>openLB(names,p.name,null); g.append(t);
+  });
+  if(!top.length) g.textContent='아직 점수를 받은 사진이 없어요.';
+}
 function renderAdmin(){
   show('admin');
-  $('#admCount').textContent=names.length.toLocaleString();
-  $('#invite').value=`💍 웨딩스냅 베스트 사진 고르기에 함께해 주세요!\n\n링크: ${location.origin}\n암호: ${invitePw||'(투표 암호)'}\n\n이름을 적고 들어오면 돼요. 같은 이름으로 다시 들어오면 고르던 곳부터 이어져요.`;
+  $('#admCount').textContent=photos.size ? order.length.toLocaleString() : '0';
+  const noMeta=order.filter(n=>{ const p=photos.get(n); return !p.hash || !p.q; }).length;
+  $('#admMeta').textContent = noMeta ? `그중 ${noMeta.toLocaleString()}장은 찍은 시각·AI 표시가 아직 없어요. 같은 폴더를 다시 고르면 채워져요.` : (order.length?'모든 사진에 찍은 시각과 AI 표시가 있어요 ✓':'');
+  $('#curVote').textContent=votePw||'-'; $('#curAdmin').textContent=adminPw||'-';
+  $('#invite').value=`💍 저희 결혼사진 고르기에 함께해 주세요!\n마음에 드는 사진에 ♥를 눌러 주시면 점수를 모아 앨범 사진을 정해요.\n\n👉 링크: ${location.origin}\n🔑 암호: ${votePw||'(투표 암호)'}\n\n이름을 넣고 들어오면 돼요. 다음에 같은 이름으로 들어오면 하던 곳부터 이어져요.`;
+  if(/Android|iPhone|iPad/i.test(navigator.userAgent)) $('#useAI').checked=false;
+  stopLive(); paintLive(); liveT=setInterval(paintLive,30000);
 }
 $('#copyInvite').onclick=()=>copy($('#invite').value,$('#invite'));
 async function setMax(v){
@@ -848,12 +1201,13 @@ document.addEventListener('click',e=>{
 $('#maxIn').addEventListener('change',e=>setMax(e.target.value));
 $('#saveVote').onclick=async()=>{
   const p=$('#newVote').value.trim();
-  try{ await api('settings',{method:'POST',json:{votePassword:p}}); invitePw=p; $('#newVote').value=''; renderAdmin(); toast('투표 암호를 바꿨어요. 초대 글도 바뀌었어요.'); }
+  try{ await api('settings',{method:'POST',json:{votePassword:p}}); votePw=p; $('#newVote').value=''; renderAdmin(); toast('투표 암호를 바꿨어요. 초대 글도 바뀌었어요.'); }
   catch(e){ if(e.message!=='signed-out') toast(e.message); }
 };
 $('#saveAdmin').onclick=async()=>{
+  if(uploading) return toast('사진을 올리는 중에는 바꿀 수 없어요. 다 올린 뒤에 바꿔 주세요.');
   const p=$('#newAdmin').value.trim();
-  try{ const d=await api('settings',{method:'POST',json:{adminPassword:p}}); token=d.token; try{ localStorage.setItem(AUTH, JSON.stringify({token,name:me.name})); }catch(e){} $('#newAdmin').value=''; toast('관리자 암호를 바꿨어요. 꼭 기억해 두세요.',4000); }
+  try{ const d=await api('settings',{method:'POST',json:{adminPassword:p}}); token=d.token; adminPw=p; try{ localStorage.setItem(AUTH, JSON.stringify({token,name:me.name})); }catch(e){} $('#newAdmin').value=''; renderAdmin(); toast('관리자 암호를 바꿨어요. 꼭 기억해 두세요.',4000); }
   catch(e){ if(e.message!=='signed-out') toast(e.message); }
 };
 function confirmRow(rowSel, label, action){
@@ -867,17 +1221,48 @@ function confirmRow(rowSel, label, action){
 }
 function bindDanger(){
   const d=$('#delAll'); if(d) d.onclick=()=>confirmRow('#delRow','네, 사진을 모두 지울게요',async()=>{
-    const r=await api('photos',{method:'DELETE',json:{all:true}}); photos=new Map(); names=[]; renderAdmin(); toast(`${r.removed}장을 지웠어요.`);
+    const r=await api('photos',{method:'DELETE',json:{all:true}}); photos=new Map(); buildOrder(); renderAdmin(); toast(`${r.removed}장을 지웠어요.`);
   });
   const v=$('#resetVotes'); if(v) v.onclick=()=>confirmRow('#resetRow','네, 투표 기록을 모두 지울게요',async()=>{
-    await api('settings',{method:'POST',json:{resetVotes:true}}); st=fresh(); try{ localStorage.removeItem(localKey()); }catch(e){} toast('투표 기록을 모두 지웠어요.');
+    await api('settings',{method:'POST',json:{resetVotes:true}}); st=fresh(); try{ localStorage.removeItem(localKey()); }catch(e){} paintLive(); toast('투표 기록을 모두 지웠어요.');
   });
 }
 bindDanger();
 
-// upload: shrink each photo in the browser, then send it
+/* ---------- upload: shrink, shooting time, look-alike fingerprint, AI checks ---------- */
 const isImg = f => /^image\//.test(f.type) || /\.(jpe?g|png|webp|heic|heif|avif)$/i.test(f.name);
-async function shrink(file){
+const mobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+
+// shooting time from the photo file itself (EXIF DateTimeOriginal + sub-seconds)
+async function exifTime(file){
+  try{
+    const v=new DataView(await file.slice(0,262144).arrayBuffer());
+    if(v.getUint16(0)!==0xFFD8) return null;
+    let off=2;
+    while(off+10<v.byteLength){
+      const marker=v.getUint16(off), len=v.getUint16(off+2);
+      if(marker===0xFFE1 && v.getUint32(off+4)===0x45786966) return tiffTime(v, off+10);
+      if((marker&0xFF00)!==0xFF00 || marker===0xFFDA) break;
+      off+=2+len;
+    }
+  }catch(e){}
+  return null;
+}
+function tiffTime(v,t){
+  const le=v.getUint16(t)===0x4949;
+  const u16=o=>v.getUint16(t+o,le), u32=o=>v.getUint32(t+o,le);
+  const str=(o,n)=>{ let s=''; for(let i=0;i<n&&t+o+i<v.byteLength;i++){ const c=v.getUint8(t+o+i); if(!c) break; s+=String.fromCharCode(c); } return s; };
+  const ifd=(o,want)=>{ const r={}; const n=u16(o); for(let i=0;i<n;i++){ const e=o+2+i*12, tag=u16(e), cnt=u32(e+4); if(want.includes(tag)) r[tag] = tag===0x8769 ? u32(e+8) : str(cnt>4?u32(e+8):e+8, cnt); } return r; };
+  const i0=ifd(u32(4),[0x8769,0x0132]);
+  let dt=null, sub='';
+  if(i0[0x8769]){ const ex=ifd(i0[0x8769],[0x9003,0x9291]); dt=ex[0x9003]; sub=ex[0x9291]||''; }
+  dt=dt||i0[0x0132]; if(!dt) return null;
+  const m=dt.match(/(\d{4}):(\d{2}):(\d{2}) (\d{2}):(\d{2}):(\d{2})/); if(!m) return null;
+  const ms=sub ? Math.round(Number('0.'+sub.replace(/\D/g,''))*1000) : 0;
+  return new Date(Date.UTC(+m[1],m[2]-1,+m[3],+m[4],+m[5],+m[6],ms)).toISOString();
+}
+// decode once into a screen-size canvas
+async function prepare(file){
   const u=URL.createObjectURL(file);
   try{
     const im=new Image(); im.decoding='async'; im.src=u; await im.decode();
@@ -885,90 +1270,166 @@ async function shrink(file){
     const w=Math.max(1,Math.round(im.naturalWidth*k)), h=Math.max(1,Math.round(im.naturalHeight*k));
     const c=document.createElement('canvas'); c.width=w; c.height=h;
     c.getContext('2d').drawImage(im,0,0,w,h);
-    const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.84));
-    c.width=c.height=0;
-    if(!blob) throw new Error('decode');
-    return {blob,w,h};
+    return c;
   } finally { URL.revokeObjectURL(u); }
 }
-let upStop=false, uploading=false;
-async function uploadFiles(list){
-  if(uploading) return toast('올리는 중이에요. 끝난 뒤에 추가해 주세요.');
-  const seen=new Set(); const jobs=[];
+function gray(src, w, h){
+  const c=document.createElement('canvas'); c.width=w; c.height=h;
+  const x=c.getContext('2d',{willReadFrequently:true}); x.drawImage(src,0,0,w,h);
+  const d=x.getImageData(0,0,w,h).data, g=new Float32Array(w*h);
+  for(let i=0;i<w*h;i++) g[i]=d[i*4]*.299+d[i*4+1]*.587+d[i*4+2]*.114;
+  return g;
+}
+function dhash(c){
+  const g=gray(c,9,8); let hex='';
+  for(let y=0;y<8;y++){ let byte=0; for(let x=0;x<8;x++) byte=(byte<<1)|(g[y*9+x]>g[y*9+x+1]?1:0); hex+=byte.toString(16).padStart(2,'0'); }
+  return hex;
+}
+function sharpExpo(c){
+  const k=Math.min(1,512/Math.max(c.width,c.height)), w=Math.max(3,Math.round(c.width*k)), h=Math.max(3,Math.round(c.height*k));
+  const g=gray(c,w,h); let sum=0, sum2=0, n=0, mean=0;
+  for(let i=0;i<g.length;i++) mean+=g[i];
+  mean/=g.length;
+  for(let y=1;y<h-1;y++) for(let x=1;x<w-1;x++){ const i=y*w+x; const l=4*g[i]-g[i-1]-g[i+1]-g[i-w]-g[i+w]; sum+=l; sum2+=l*l; n++; }
+  const varL = n ? sum2/n - (sum/n)**2 : 0;
+  return { sharp: Math.round(varL*10)/10, expo: mean<45 ? 'dark' : mean>215 ? 'bright' : null };
+}
+// face check runs one photo at a time
+let lmP=null, aiChain=Promise.resolve(), aiWarned=false;
+function getLM(){
+  if(!lmP) lmP=(async()=>{
+    const v=await import('/ai/vision_bundle.mjs');
+    const fs=await v.FilesetResolver.forVisionTasks('/ai/wasm');
+    return v.FaceLandmarker.createFromOptions(fs,{ baseOptions:{ modelAssetPath:'/ai/face_landmarker.task', delegate:'CPU' }, runningMode:'IMAGE', numFaces:6, outputFaceBlendshapes:true });
+  })();
+  return lmP;
+}
+function faceCheck(c){
+  const run=aiChain.then(async()=>{
+    const lm=await getLM();
+    const r=lm.detect(c);
+    let faces=0, closed=false;
+    (r.faceLandmarks||[]).forEach((pts,i)=>{
+      let a=1,b=0; for(const p of pts){ if(p.x<a) a=p.x; if(p.x>b) b=p.x; }
+      if(b-a<0.035) return;                 // too small to judge
+      faces++;
+      const cats=r.faceBlendshapes?.[i]?.categories||[];
+      const s=k=>cats.find(x=>x.categoryName===k)?.score||0;
+      if(s('eyeBlinkLeft')>0.5 && s('eyeBlinkRight')>0.5) closed=true;
+    });
+    return { faces, closed };
+  });
+  aiChain=run.catch(()=>{});
+  return run;
+}
+let upStop=false, uploading=false, wake=null;
+addEventListener('beforeunload', e=>{ if(uploading){ e.preventDefault(); e.returnValue=''; } });
+async function processFiles(list){
+  if(uploading) return toast('올리는 중이에요. 끝난 뒤에 다시 골라 주세요.');
+  const useAI=$('#useAI').checked;
+  const seen=new Set(), jobs=[];
   for(const f of list){
     if(f.name.startsWith('.')||!isImg(f)) continue;
     let k=f.name;
     if(seen.has(k)){ const i=k.lastIndexOf('.'), base=i>0?k.slice(0,i):k, ext=i>0?k.slice(i):''; let c=2; while(seen.has(`${base} (${c})${ext}`)) c++; k=`${base} (${c})${ext}`; }
     seen.add(k);
-    if(photos.has(k)) continue;
-    jobs.push([k,f]);
+    const p=photos.get(k);
+    if(!p) jobs.push({k,f,up:true});
+    else if(!p.hash || !p.q || (useAI && p.q.faces===undefined)) jobs.push({k,f,up:false});
   }
-  if(!jobs.length) return toast('새로 올릴 사진이 없어요 (이미 올라간 사진이에요).');
+  if(!jobs.length) return toast('새로 올리거나 채울 사진이 없어요. 모두 올라가 있어요 ✓');
   uploading=true; upStop=false; $('#upBox').hidden=false;
-  let done=0, fail=0, heic=0, lastErr=''; const total=jobs.length;
-  const paint=()=>{ $('#upBar').style.width=((done+fail)/total*100)+'%';
-    $('#upTxt').textContent=`${(done+fail).toLocaleString()} / ${total.toLocaleString()}장 처리 · 성공 ${done.toLocaleString()}`+(fail?` · 실패 ${fail}`:'')+(heic?' (HEIC 사진은 아이폰 사파리에서 올려 주세요)':'')+(lastErr?` · 원인: ${lastErr}`:''); };
+  try{ wake=await navigator.wakeLock?.request('screen'); }catch(e){}
+  let up=0, meta=0, fail=0, lastErr=''; const total=jobs.length;
+  const metaBuf=[];
+  const paint=()=>{
+    $('#upBar').style.width=((up+meta+fail)/total*100)+'%';
+    $('#upTxt').textContent=`${(up+meta+fail).toLocaleString()} / ${total.toLocaleString()}장 · 새로 올림 ${up.toLocaleString()} · 정보 채움 ${meta.toLocaleString()}`+(fail?` · 실패 ${fail}장`:'')+(lastErr?` · 원인: ${lastErr}`:'')+' (화면을 켜 두세요)';
+  };
+  const sendMeta=async(force)=>{
+    if(!metaBuf.length || (!force && metaBuf.length<20)) return;
+    const items=metaBuf.splice(0,metaBuf.length);
+    try{ await api('meta',{method:'POST',json:{items}}); }catch(e){ if(e.message==='signed-out'){ upStop=true; } else lastErr='정보 저장 실패'; }
+  };
   paint();
   async function worker(){
     while(jobs.length && !upStop){
-      const [name,f]=jobs.shift();
-      let ok=false;
-      for(let t=0;t<2&&!ok;t++){
+      const job=jobs.shift(); let ok=false;
+      for(let t=0;t<2&&!ok&&!upStop;t++){
+        let c=null;
         try{
-          const {blob,w,h}=await shrink(f);
-          const r=await fetch(`/api/upload?name=${encodeURIComponent(name)}&w=${w}&h=${h}`,{method:'POST',headers:{authorization:'Bearer '+token,'content-type':'image/jpeg'},body:blob});
-          if(r.status===401){ upStop=true; signOut('다시 들어와 주세요.'); return; }
-          if(!r.ok){ const d=await r.json().catch(()=>({})); lastErr=d.error||('오류 '+r.status); throw new Error(); }
-          const p=await r.json(); photos.set(p.name,p); ok=true;
-        }catch(e){ if(/heic|heif/i.test(name)) { heic++; break; } }
+          const [taken, canvas]=await Promise.all([exifTime(job.f), prepare(job.f)]); c=canvas;
+          const hash=dhash(c);
+          const q=sharpExpo(c);
+          if(useAI){ try{ Object.assign(q, await faceCheck(c)); }catch(e){ if(!aiWarned){ aiWarned=true; toast('이 브라우저에서는 얼굴 확인을 못 해요. 흐림·밝기만 살펴볼게요.',4000); } } }
+          if(job.up){
+            const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.84));
+            if(!blob) throw new Error('decode');
+            const qs=`name=${encodeURIComponent(job.k)}&w=${c.width}&h=${c.height}&hash=${hash}`+(taken?`&t=${encodeURIComponent(taken)}`:'');
+            const r=await fetch('/api/upload?'+qs,{method:'POST',headers:{authorization:'Bearer '+token,'content-type':'image/jpeg'},body:blob});
+            if(r.status===401){ upStop=true; signOut('다시 들어와 주세요.'); return; }
+            if(!r.ok){ const d=await r.json().catch(()=>({})); lastErr=d.error||('오류 '+r.status); throw new Error(); }
+            const p=await r.json(); photos.set(p.name,{...p, hash, q});
+            metaBuf.push({name:job.k, q}); up++;
+          } else {
+            const p=photos.get(job.k); Object.assign(p,{hash,q}, taken?{taken_at:taken}:{});
+            metaBuf.push({name:job.k, taken_at:taken, hash, q}); meta++;
+          }
+          ok=true;
+        }catch(e){
+          if(/heic|heif/i.test(job.k)){ lastErr='HEIC 사진은 아이폰 사파리에서 올려 주세요'; break; }
+        } finally { if(c){ c.width=c.height=0; } }
       }
-      ok?done++:fail++; paint();
+      if(!ok) fail++;
+      paint(); await sendMeta(false);
     }
   }
-  await Promise.all([worker(),worker(),worker()]);
-  names=[...photos.keys()].sort(cmp);
-  uploading=false; $('#admCount').textContent=names.length.toLocaleString();
-  $('#upTxt').textContent+= upStop?' · 멈췄어요':' · 끝났어요';
-  toast(`${done.toLocaleString()}장을 올렸어요.`);
+  await Promise.all(Array.from({length: mobile?2:3}, worker));
+  await sendMeta(true);
+  try{ await wake?.release(); }catch(e){} wake=null;
+  uploading=false; buildOrder(); renderAdmin();
+  $('#upBox').hidden=false; paint();
+  $('#upTxt').textContent += upStop ? ' · 멈췄어요' : ' · 끝났어요';
+  toast(upStop ? '멈췄어요. 같은 사진을 다시 고르면 이어서 해요.' : `끝났어요! 새로 ${up.toLocaleString()}장, 정보 채움 ${meta.toLocaleString()}장`, 4000);
 }
-$('#upFiles').addEventListener('change',e=>{ uploadFiles([...e.target.files]); e.target.value=''; });
-$('#upDir').addEventListener('change',e=>{ uploadFiles([...e.target.files]); e.target.value=''; });
+$('#upFiles').addEventListener('change',e=>{ processFiles([...e.target.files]); e.target.value=''; });
+$('#upDir').addEventListener('change',e=>{ processFiles([...e.target.files]); e.target.value=''; });
 $('#upStop').onclick=()=>{ upStop=true; };
-/* ---------- lightbox ---------- */
+
+/* ---------- big view ---------- */
 const lbz=new Zoom($('#lbBox'),{ swipe:d=>lbStep(-d) });
 let lb=null;
-function openLB(list, n, sel, toggle){ lb={list, i:Math.max(0,list.indexOf(n)), sel, toggle}; $('#lb').hidden=false; renderLB(); }
-function renderLB(){
-  const n=lb.list[lb.i]; showImg($('#lbBox'),n,lbz);
+function openLB(list, n, act){ lb={list, i:Math.max(0,list.indexOf(n)), act}; $('#lb').hidden=false; renderLB(false); }
+function renderLB(keep){
+  const n=lb.list[lb.i]; showImg($('#lbBox'),n,lbz,keep);
   preload(lb.list[lb.i+1]);
   $('#lbName').textContent=n; $('#lbPos').textContent=`${lb.i+1} / ${lb.list.length}`;
-  $('#lbHeart').hidden=!lb.sel; if(!lb.sel) return;
-  const on=lb.sel.has(n); $('#lbHeart').classList.toggle('on',on); $('#lbHeart').textContent=on?'♥ 선택됨':'♡ 선택';
+  const a=lb.act; $('#lbAct').hidden=!a; if(!a) return;
+  const on=!!a.on(n); $('#lbAct').classList.toggle('on',on); $('#lbAct').textContent=a.label(on);
 }
-function lbStep(d){ if(!lb) return; lb.i=(lb.i+d+lb.list.length)%lb.list.length; renderLB(); }
+function lbStep(d){ if(!lb) return; lb.i=(lb.i+d+lb.list.length)%lb.list.length; renderLB(true); }
 function closeLB(){ $('#lb').hidden=true; lb=null; }
 $('#lbClose').onclick=closeLB; $('#lbPrev').onclick=()=>lbStep(-1); $('#lbNext').onclick=()=>lbStep(1);
-$('#lbHeart').onclick=()=>{ if(lb?.toggle){ lb.toggle(lb.list[lb.i]); renderLB(); } };
+$('#lbAct').onclick=()=>{ if(lb?.act){ lb.act.toggle(lb.list[lb.i]); renderLB(true); } };
 
 /* ---------- keyboard ---------- */
 document.addEventListener('keydown', e=>{
   if(e.target.matches('input,textarea')) return;
   if(!$('#lb').hidden){
     if(e.key==='Escape') closeLB(); else if(e.key==='ArrowLeft') lbStep(-1); else if(e.key==='ArrowRight') lbStep(1);
-    else if((e.key===' '||e.key==='Enter') && lb?.toggle){ e.preventDefault(); $('#lbHeart').click(); }
+    else if((e.key===' '||e.key==='Enter') && lb?.act){ e.preventDefault(); $('#lbAct').click(); }
     return;
   }
-  if(!$('#s1').hidden){
-    if(e.key==='ArrowRight'){ e.preventDefault(); decide(1); } else if(e.key==='ArrowLeft'){ e.preventDefault(); decide(0); }
-    else if(e.key==='z'||e.key==='Z'||e.key==='Backspace') undo1();
-  } else if(!$('#s2').hidden){
-    if(e.key==='ArrowLeft'){ e.preventDefault(); pick('L'); } else if(e.key==='ArrowRight'){ e.preventDefault(); pick('R'); }
-    else if(e.key==='ArrowDown'||e.key===' '){ e.preventDefault(); pick('B'); }
-    else if(e.key==='f'||e.key==='F'){ if(!flipOn){ flipOn=true; flipShow='A'; } else flipShow=flipShow==='A'?'B':'A'; updateFlip(); }
-    else if(e.key==='z'||e.key==='Z'||e.key==='Backspace') undo2();
+  if(curScreen==='pick'){
+    if(!$('#pSingle').hidden){
+      if(e.key==='ArrowRight'){ e.preventDefault(); decide(1); } else if(e.key==='ArrowLeft'){ e.preventDefault(); decide(0); }
+    } else if(e.key==='Enter'){ e.preventDefault(); $('#gKeep').click(); }
+    if(e.key==='z'||e.key==='Z'||e.key==='Backspace') undo1();
+  } else if(curScreen==='sort'){
+    if(e.key==='1') bucket('must'); else if(e.key==='2') bucket('maybe'); else if(e.key==='3') bucket('out');
+    else if(e.key==='z'||e.key==='Z'||e.key==='Backspace') undo3();
   }
 });
-
 
 /* ---------- start ---------- */
 (async()=>{

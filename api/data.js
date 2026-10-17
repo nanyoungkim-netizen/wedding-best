@@ -7,7 +7,8 @@ export async function GET(req) {
   const [photos, me] = await Promise.all([listPhotos(), getVoter(a.name)]);
   return json({
     role: a.role, name: a.name, max: Number(a.settings.max) || 20,
-    invitePw: a.role === 'admin' ? a.settings.vote_pw_plain || '' : undefined,
+    votePw: a.role === 'admin' ? a.settings.vote_pw_plain || '' : undefined,
+    adminPw: a.role === 'admin' ? a.settings.admin_pw_plain || '' : undefined,
     photos, me,
   });
 }

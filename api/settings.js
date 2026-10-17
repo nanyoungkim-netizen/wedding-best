@@ -24,6 +24,7 @@ export async function POST(req) {
     if (p.length < 6) return json({ error: '관리자 암호는 6자 이상으로 정해 주세요.' }, 400);
     const h = hashPw(a.settings, p);
     await setSetting('admin_pw', h);
+    await setSetting('admin_pw_plain', p);
     out.token = sign(a.settings, 'admin', a.name, h);   // keep this admin signed in
   }
   if (b.resetVotes === true) await resetVotes();

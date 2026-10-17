@@ -18,7 +18,9 @@ export async function POST(req) {
   try { url = await putImage(name, buf, type); }
   catch (e) { return json({ error: '사진 저장소에 올리지 못했어요: ' + String(e?.message || e).slice(0, 200) }, 502); }
   const w = Number(u.searchParams.get('w')) || null, h = Number(u.searchParams.get('h')) || null;
-  await upsertPhoto({ name, url, w, h });
+  const t = u.searchParams.get('t'), hash = u.searchParams.get('hash');
+  const taken_at = t && !isNaN(Date.parse(t)) ? new Date(t).toISOString() : null;
+  await upsertPhoto({ name, url, w, h, taken_at, hash: /^[0-9a-f]{16}$/.test(hash || '') ? hash : null });
   if (old && old.url !== url) await delImages([old.url]).catch(() => {});
-  return json({ name, url, w, h });
+  return json({ name, url, w, h, taken_at });
 }

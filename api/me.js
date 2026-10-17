@@ -10,6 +10,7 @@ export async function PUT(req) {
   try { b = JSON.parse(text); } catch { return json({ error: '잘못된 요청이에요.' }, 400); }
   const max = Number(a.settings.max) || 20;
   const picks = [...new Set((Array.isArray(b.picks) ? b.picks : []).map(String))].slice(0, max);
+  if (b.state && Array.isArray(b.state.final)) b.state.final = b.state.final.slice(0, max);
   const state = b.state && typeof b.state === 'object' ? b.state : {};
   await saveVoter(a.name, state, picks);
   return json({ ok: true });

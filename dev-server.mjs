@@ -27,7 +27,10 @@ http.createServer(async (req, res) => {
       if (!b) { res.writeHead(404); return res.end(); }
       res.writeHead(200, { 'content-type': b.type }); return res.end(b.buf);
     }
-    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
-    res.end(fs.readFileSync('index.html'));
+    const types = { '.mjs': 'text/javascript', '.js': 'text/javascript', '.wasm': 'application/wasm', '.task': 'application/octet-stream', '.html': 'text/html; charset=utf-8' };
+    const file = u.pathname === '/' ? 'index.html' : decodeURIComponent(u.pathname.slice(1));
+    if (file.includes('..') || !fs.existsSync(file) || fs.statSync(file).isDirectory()) { res.writeHead(404); return res.end(); }
+    res.writeHead(200, { 'content-type': types[file.slice(file.lastIndexOf('.'))] || 'application/octet-stream' });
+    res.end(fs.readFileSync(file));
   } catch (e) { console.error(e); res.writeHead(500); res.end(String(e)); }
 }).listen(process.env.PORT || 3000, () => console.log('http://localhost:' + (process.env.PORT || 3000)));
