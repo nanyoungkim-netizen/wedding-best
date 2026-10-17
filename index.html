@@ -1365,10 +1365,11 @@ function faceCheck(c){
     const W=c.width, H=c.height, m=Math.min(W,H);
     let found=facesIn(lm, c, 0, 0, W, H, 0.035);
     // look window by window, letting the page breathe in between, and give each photo a time budget
-    const wins=[...windows(W,H,m*0.4,m*0.2,0,0), ...windows(W,H,m*0.2,m*0.12,0.15,0.12)];
+    // people are almost always in the middle part of a wedding snap: zoom in there first
+    const wins=[...windows(W,H,m*0.22,m*0.16,0.2,0.15), ...windows(W,H,m*0.45,m*0.3,0.1,0.05)];
     const t0=performance.now();
     for(const [x,y,sz] of wins){
-      if(upStop || performance.now()-t0 > 4000) break;
+      if(upStop || performance.now()-t0 > 2500) break;
       await new Promise(r=>setTimeout(r,0));
       found=found.concat(facesIn(lm,c,x,y,sz,sz,0.12));
     }
@@ -1431,7 +1432,7 @@ async function processFiles(list){
           const [taken, canvas]=await Promise.all([exifTime(job.f), prepare(job.f)]); c=canvas;
           const hash=dhash(c);
           const q=sharpExpo(c);
-          if(useAI){ try{ Object.assign(q, await faceCheck(c)); }catch(e){ if(!aiWarned){ aiWarned=true; toast('이 브라우저에서는 얼굴 확인을 못 해요. 흐림·밝기만 살펴볼게요.',4000); } } }
+          if(useAI){ try{ $('#upTxt').dataset.ai='1'; Object.assign(q, await faceCheck(c)); }catch(e){ if(!aiWarned){ aiWarned=true; toast('이 브라우저에서는 얼굴 확인을 못 해요. 흐림·밝기만 살펴볼게요.',4000); } } }
           if(job.up){
             const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.84));
             if(!blob) throw new Error('decode');
