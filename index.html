@@ -1335,20 +1335,46 @@ function getLM(){
   })();
   return lmP;
 }
+// Wedding snaps often show people small in a wide scene, and the face model only finds faces that fill
+// a good part of what it looks at. So we look at the whole photo, then at zoomed-in windows of it.
+const FACE_V=2;
+const win=document.createElement('canvas'); win.width=win.height=256;
+const winCtx=win.getContext('2d');
+function facesIn(lm, src, sx, sy, sw, sh, minRel){
+  let target=src;
+  if(sw!==src.width || sh!==src.height){ winCtx.drawImage(src,sx,sy,sw,sh,0,0,256,256); target=win; }
+  const r=lm.detect(target), out=[];
+  (r.faceLandmarks||[]).forEach((pts,i)=>{
+    let x0=1,x1=0,y0=1,y1=0;
+    for(const p of pts){ if(p.x<x0) x0=p.x; if(p.x>x1) x1=p.x; if(p.y<y0) y0=p.y; if(p.y>y1) y1=p.y; }
+    if(x1-x0<minRel) return;
+    const cats=r.faceBlendshapes?.[i]?.categories||[];
+    const s=k=>cats.find(x=>x.categoryName===k)?.score||0;
+    out.push({ cx:sx+(x0+x1)/2*sw, cy:sy+(y0+y1)/2*sh, w:(x1-x0)*sw, closed: s('eyeBlinkLeft')>0.55 && s('eyeBlinkRight')>0.55 });
+  });
+  return out;
+}
+function windows(W,H,size,stride,mx,my){
+  const out=[], x0=W*mx, y0=H*my, x1=W*(1-mx), y1=H*(1-my);
+  for(let y=y0; y+size<=y1+1; y+=stride) for(let x=x0; x+size<=x1+1; x+=stride) out.push([Math.round(x),Math.round(y),Math.round(size)]);
+  return out;
+}
 function faceCheck(c){
   const run=aiChain.then(async()=>{
     const lm=await getLM();
-    const r=lm.detect(c);
-    let faces=0, closed=false;
-    (r.faceLandmarks||[]).forEach((pts,i)=>{
-      let a=1,b=0; for(const p of pts){ if(p.x<a) a=p.x; if(p.x>b) b=p.x; }
-      if(b-a<0.035) return;                 // too small to judge
-      faces++;
-      const cats=r.faceBlendshapes?.[i]?.categories||[];
-      const s=k=>cats.find(x=>x.categoryName===k)?.score||0;
-      if(s('eyeBlinkLeft')>0.5 && s('eyeBlinkRight')>0.5) closed=true;
-    });
-    return { faces, closed };
+    const W=c.width, H=c.height, m=Math.min(W,H);
+    let found=facesIn(lm, c, 0, 0, W, H, 0.035);
+    for(const [x,y,sz] of windows(W,H,m*0.4,m*0.2,0,0)) found=found.concat(facesIn(lm,c,x,y,sz,sz,0.12));
+    for(const [x,y,sz] of windows(W,H,m*0.2,m*0.12,0.15,0.12)) found=found.concat(facesIn(lm,c,x,y,sz,sz,0.12));
+    found=found.filter(f=>f.w>=18);                     // eyes need at least a few pixels
+    // the same face is seen by several windows: merge them
+    const faces=[];
+    for(const f of found){
+      const g=faces.find(o=>Math.hypot(o.cx-f.cx,o.cy-f.cy) < 0.6*Math.max(o.w,f.w));
+      if(g){ g.n++; g.c+=f.closed?1:0; } else faces.push({cx:f.cx,cy:f.cy,w:f.w,n:1,c:f.closed?1:0});
+    }
+    const closed=faces.some(f=>f.c/f.n>=0.5);
+    return { faces: faces.length, closed, v: FACE_V };
   });
   aiChain=run.catch(()=>{});
   return run;
@@ -1366,7 +1392,7 @@ async function processFiles(list){
     seen.add(k);
     const p=photos.get(k);
     if(!p) jobs.push({k,f,up:true});
-    else if(!p.hash || !p.q || (useAI && p.q.faces===undefined)) jobs.push({k,f,up:false});
+    else if(!p.hash || !p.q || (useAI && (p.q.v||0)<FACE_V)) jobs.push({k,f,up:false});
   }
   if(!jobs.length) return toast('새로 올리거나 채울 사진이 없어요. 모두 올라가 있어요 ✓');
   uploading=true; upStop=false; $('#upBox').hidden=false;
