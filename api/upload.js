@@ -14,7 +14,9 @@ export async function POST(req) {
   const buf = Buffer.from(await req.arrayBuffer());
   if (!buf.length || buf.length > 4_400_000) return json({ error: '사진 크기가 맞지 않아요.' }, 413);
   const old = await getPhoto(name);
-  const url = await putImage(name, buf, type);
+  let url;
+  try { url = await putImage(name, buf, type); }
+  catch (e) { return json({ error: '사진 저장소에 올리지 못했어요: ' + String(e?.message || e).slice(0, 200) }, 502); }
   const w = Number(u.searchParams.get('w')) || null, h = Number(u.searchParams.get('h')) || null;
   await upsertPhoto({ name, url, w, h });
   if (old && old.url !== url) await delImages([old.url]).catch(() => {});

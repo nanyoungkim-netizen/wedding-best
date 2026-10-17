@@ -10,5 +10,5 @@
    - `voters (name text primary key, state jsonb not null default '{}'::jsonb, picks text[] not null default '{}', updated_at timestamptz not null default now())`
 2. `settings`에 넣을 값: `max`(기본 20), `auth_secret`(무작위 문자열), `vote_pw`/`admin_pw`(= sha256(auth_secret + ':' + 암호) 16진수), `vote_pw_plain`(초대 글에 보일 투표 암호).
 3. Vercel 프로젝트 `wedding-best`(framework 없음)를 만든다.
-4. Storage 화면에서 `wedding-best`(Neon)와 `wedding-best-photos`(Blob)를 이 프로젝트에 **Connect** 한다. 접속 정보(`DATABASE_URL`, `BLOB_READ_WRITE_TOKEN`)가 자동으로 들어간다.
+4. Storage 화면에서 `wedding-best`(Neon)와 `wedding-best-photos`(Blob)를 이 프로젝트에 **Connect** 한다. 접속 정보(`DATABASE_URL`, `BLOB_STORE_ID`)가 자동으로 들어간다.
 5. 이 브랜치의 파일로 production 배포 → 관리자 암호로 로그인해 사진 1장 올리기, 투표, 갤러리까지 확인.

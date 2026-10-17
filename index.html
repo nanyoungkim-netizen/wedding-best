@@ -7,23 +7,26 @@
 <title>웨딩스냅 베스트</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
 :root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
 body{margin:0}
 img{max-width:100%}
 
-/* Layout: a darkroom light-table. One-screen app, header with the steps, photo fills the rest. Single dark look on purpose (photos read best on dark). */
+/* Layout: a garden-party picker. One-screen app, header with the steps, photo fills the rest.
+   Single light look on purpose (soft sage paper, white rounded cards, deep green accent); photos sit on a dark green stage. */
 :root{
-  color-scheme: dark;
-  --bg:#121418; --panel:#1b1f26; --panel2:#232831; --line:#2e3440;
-  --fg:#eeebe4; --mute:#9ba1ab;
-  --rose:#efb8c8; --rose-ink:#2a1820;
-  --keep:#8fd1a8; --pass:#ee8a7f;
-  --a:#efb8c8; --a-ink:#2a1820; --b:#9ec5f0; --b-ink:#10233a;
-  --display:"Gowun Batang", "Nanum Myeongjo", serif;
-  --body:"Noto Sans KR", system-ui, -apple-system, sans-serif;
-  --r:12px;
+  color-scheme: light;
+  --bg:#eef2ea; --panel:#ffffff; --panel2:#f4f7f2; --line:#d5dfd1;
+  --fg:#1f3328; --mute:#5d6f63;
+  --rose:#2f5d46; --rose-ink:#ffffff;      /* accent (kept the old token name) */
+  --keep:#2f7a55; --pass:#c0564a;
+  --a:#f4cad2; --a-ink:#4a1f29; --b:#c3dcf2; --b-ink:#14324c;
+  --stage:#1c2a22;
+  --display:"Gowun Dodum", "Noto Sans KR", sans-serif;
+  --body:"Gowun Dodum", "Noto Sans KR", system-ui, -apple-system, sans-serif;
+  --r:18px;
+  --shadow:0 4px 14px rgba(47,93,70,.08);
 }
 [hidden]{display:none!important}
 html{height:100%;box-sizing:border-box}
@@ -53,13 +56,13 @@ main{flex:1;min-height:0;position:relative}
 .home h1 span{color:var(--rose)}
 .lead{color:var(--mute);margin:0;max-width:60ch}
 .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;list-style:none;padding:0;margin:0}
-.steps li{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:4px}
+.steps li{background:var(--panel);border:1px solid transparent;box-shadow:var(--shadow);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:4px}
 .steps .n{font-family:var(--display);color:var(--rose);font-size:13px}
 .steps strong{font-size:15px}
 .steps small{color:var(--mute);font-size:13px;line-height:1.5}
 .field{display:flex;flex-direction:column;gap:6px}
 .field label{font-size:13px;color:var(--mute)}
-input[type=text],textarea{background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--fg);padding:11px 12px;font:inherit;width:100%}
+input[type=text],textarea{background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--fg);padding:11px 12px;font:inherit;width:100%}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;padding:11px 18px;border:1px solid var(--line);background:var(--panel2);font-weight:500;font-size:14px;cursor:pointer;user-select:none}
 .btn.main{background:var(--rose);color:var(--rose-ink);border-color:var(--rose)}
@@ -77,7 +80,7 @@ input[type=text],textarea{background:var(--panel);border:1px solid var(--line);b
 .resume{border:1px dashed var(--rose);border-radius:var(--r);padding:12px 14px;font-size:14px;display:flex;flex-direction:column;gap:8px}
 
 /* ---------- viewer ---------- */
-.zbox{position:relative;overflow:hidden;background:#0b0c0f;border-radius:var(--r);touch-action:none;min-height:0;flex:1;user-select:none;-webkit-user-select:none}
+.zbox{position:relative;overflow:hidden;background:var(--stage);border-radius:var(--r);touch-action:none;min-height:0;flex:1;user-select:none;-webkit-user-select:none}
 .zbox img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transform-origin:0 0;will-change:transform;pointer-events:none;-webkit-user-drag:none}
 .zbox .tag{position:absolute;left:10px;top:10px;background:rgba(0,0,0,.55);padding:3px 9px;border-radius:999px;font-size:12px;color:#ddd;pointer-events:none;max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .zbox .err{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:20px;color:var(--mute);font-size:14px}
@@ -132,8 +135,8 @@ input[type=text],textarea{background:var(--panel);border:1px solid var(--line);b
 .gridwrap{flex:1;min-height:0;overflow-y:auto}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;padding-bottom:12px}
 @media (max-width:480px){.grid{grid-template-columns:repeat(2,1fr)}}
-.tile{position:relative;aspect-ratio:3/2;background:var(--panel);border-radius:10px;overflow:hidden;border:2px solid transparent;cursor:zoom-in}
-.tile.on{border-color:var(--rose)}
+.tile{position:relative;aspect-ratio:3/2;background:var(--panel);border-radius:14px;overflow:hidden;border:2px solid transparent;cursor:zoom-in}
+.tile.on{border-color:var(--rose);box-shadow:0 0 0 2px var(--rose)}
 .tile img{width:100%;height:100%;object-fit:cover;display:block}
 .tile .nm{position:absolute;left:0;right:0;bottom:0;padding:14px 8px 5px;font-size:11px;color:#ddd;background:linear-gradient(transparent,rgba(0,0,0,.7));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tile .missing{position:absolute;inset:0;display:grid;place-items:center;font-size:12px;color:var(--mute);padding:8px;text-align:center}
@@ -155,7 +158,7 @@ input[type=text],textarea{background:var(--panel);border:1px solid var(--line);b
 /* ---------- merge ---------- */
 .merge{max-width:980px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:18px;padding-bottom:30px}
 .merge h2{font-family:var(--display);font-size:22px;margin:0}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px}
+.card{background:var(--panel);border:1px solid transparent;box-shadow:var(--shadow);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px}
 .card h3{margin:0;font-size:15px}
 .card p{margin:0;color:var(--mute);font-size:13.5px}
 .code{font-family:ui-monospace,Menlo,monospace;font-size:12px;min-height:90px;resize:vertical}
@@ -175,7 +178,15 @@ input[type=text],textarea{background:var(--panel);border:1px solid var(--line);b
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
 /* ---------- site additions ---------- */
-input[type=password]{background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--fg);padding:11px 12px;font:inherit;width:100%}
+.eyebrow{align-self:flex-start;background:#d9e6d3;color:var(--rose);border-radius:999px;padding:4px 12px;font-size:13px}
+.home h1 span{color:#2f7a55}
+.btn{border-radius:14px}
+.btn.main{box-shadow:0 4px 12px rgba(47,93,70,.18)}
+.big{box-shadow:var(--shadow);border-color:transparent}
+.choice{border-radius:18px;box-shadow:var(--shadow)}
+nav button[aria-current="true"]{box-shadow:var(--shadow);border-color:transparent}
+.maxStep,.chipbtn{background:var(--panel)}
+input[type=password]{background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--fg);padding:11px 12px;font:inherit;width:100%}
 .err{margin:0;color:var(--pass);font-size:13.5px;min-height:1em}
 .who{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--mute);white-space:nowrap}
 .who #whoName{color:var(--fg)}
@@ -209,7 +220,8 @@ input[type=password]{background:var(--panel);border:1px solid var(--line);border
     <!-- LOGIN -->
     <section class="screen scroll" id="login">
       <div class="home">
-        <h1>천 장 중에서<br><span>우리의 베스트</span>를 골라요</h1>
+        <span class="eyebrow">💐 우리 결혼사진 고르기</span>
+        <h1><span>우리의 베스트</span>를 골라요</h1>
         <p class="lead">받은 암호와 이름을 적고 들어오세요. 같은 이름으로 다시 들어오면 고르던 곳부터 이어져요. 다른 휴대폰에서 들어와도 돼요.</p>
         <form class="card" id="loginForm" autocomplete="on">
           <div class="field"><label for="lName">이름</label><input type="text" id="lName" maxlength="20" autocomplete="nickname" required></div>
@@ -893,9 +905,9 @@ async function uploadFiles(list){
   }
   if(!jobs.length) return toast('새로 올릴 사진이 없어요 (이미 올라간 사진이에요).');
   uploading=true; upStop=false; $('#upBox').hidden=false;
-  let done=0, fail=0, heic=0; const total=jobs.length;
+  let done=0, fail=0, heic=0, lastErr=''; const total=jobs.length;
   const paint=()=>{ $('#upBar').style.width=((done+fail)/total*100)+'%';
-    $('#upTxt').textContent=`${(done+fail).toLocaleString()} / ${total.toLocaleString()}장 처리 · 성공 ${done.toLocaleString()}`+(fail?` · 실패 ${fail}`:'')+(heic?' (HEIC 사진은 아이폰 사파리에서 올려 주세요)':''); };
+    $('#upTxt').textContent=`${(done+fail).toLocaleString()} / ${total.toLocaleString()}장 처리 · 성공 ${done.toLocaleString()}`+(fail?` · 실패 ${fail}`:'')+(heic?' (HEIC 사진은 아이폰 사파리에서 올려 주세요)':'')+(lastErr?` · 원인: ${lastErr}`:''); };
   paint();
   async function worker(){
     while(jobs.length && !upStop){
@@ -906,7 +918,7 @@ async function uploadFiles(list){
           const {blob,w,h}=await shrink(f);
           const r=await fetch(`/api/upload?name=${encodeURIComponent(name)}&w=${w}&h=${h}`,{method:'POST',headers:{authorization:'Bearer '+token,'content-type':'image/jpeg'},body:blob});
           if(r.status===401){ upStop=true; signOut('다시 들어와 주세요.'); return; }
-          if(!r.ok) throw new Error();
+          if(!r.ok){ const d=await r.json().catch(()=>({})); lastErr=d.error||('오류 '+r.status); throw new Error(); }
           const p=await r.json(); photos.set(p.name,p); ok=true;
         }catch(e){ if(/heic|heif/i.test(name)) { heic++; break; } }
       }

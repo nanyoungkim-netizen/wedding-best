@@ -8,7 +8,7 @@
 
 ## 배포에 필요한 설정
 - 환경 변수 `DATABASE_URL`: 웨딩 전용 데이터베이스 접속 주소
-- Vercel Blob 저장소를 프로젝트에 연결 (`BLOB_READ_WRITE_TOKEN`이 자동으로 생겨요)
+- Vercel Blob 저장소를 프로젝트에 연결 (`BLOB_STORE_ID`가 자동으로 생기고, 사이트는 Vercel 로그인 토큰으로 접근해요)
 
 ## 내 컴퓨터에서 시험
 `npm install && node dev-server.mjs` → http://localhost:3000 (투표 암호 vote1234, 관리자 암호 admin1234, 데이터는 메모리에만 저장)
