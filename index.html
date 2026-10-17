@@ -238,6 +238,21 @@ input[type=password]{background:var(--panel2);border:1px solid var(--line);borde
 .ai.warn{background:rgba(192,86,74,.92);color:#fff}
 .grid.mini{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}
 #lbAct{min-width:96px}
+/* big-photo mode: the photo fills the screen, buttons float over it */
+body.focus header, body.focus #cheer, body.focus .screen>.meta, body.focus .hint{display:none!important}
+body.focus #s1box, body.focus #soBox{position:fixed;inset:0;border-radius:0;z-index:15;box-shadow:none}
+body.focus #pSingle .bar, body.focus #sort .three, body.focus #sort .bar{position:fixed;left:0;right:0;z-index:16;padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+body.focus #pSingle .bar{bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+body.focus #sort .three{bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+body.focus #sort .bar{bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+body.focus .focusBtn{display:none}
+body.focus #pSingle .bar .btn, body.focus #sort .bar .btn{background:rgba(255,255,255,.85);border-color:transparent}
+body.focus .big{box-shadow:0 4px 16px rgba(0,0,0,.35)}
+body.focus .three .choice{box-shadow:0 4px 16px rgba(0,0,0,.35);opacity:.95}
+#focusExit{position:fixed;z-index:17;top:calc(10px + env(safe-area-inset-top,0px));right:max(12px,env(safe-area-inset-right,0px));border:none;border-radius:999px;padding:8px 14px;background:rgba(255,255,255,.88);color:#1f3328;font:inherit;font-size:13px;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+#focusInfo{position:fixed;z-index:17;top:calc(14px + env(safe-area-inset-top,0px));left:max(12px,env(safe-area-inset-left,0px));background:rgba(0,0,0,.55);color:#fff;border-radius:999px;padding:5px 12px;font-size:12.5px;font-variant-numeric:tabular-nums}
+body.focus .zbox .tag{top:calc(48px + env(safe-area-inset-top,0px))}
+body.focus .zbox .aitags{top:calc(80px + env(safe-area-inset-top,0px))}
 #lbAct.on{background:var(--rose);color:var(--rose-ink);border-color:var(--rose)}
 @media (max-width:480px){
   .three .choice{min-height:58px;font-size:20px}
@@ -313,14 +328,14 @@ input[type=password]{background:var(--panel2);border:1px solid var(--line);borde
 
     <!-- STEP 1: pick -->
     <section class="screen" id="pick" hidden>
-      <div class="meta"><span>1단계 · 마음에 드는 사진 고르기 <button class="revlink" data-all="pick">이 단계 전체 보기</button></span><span><strong id="pCount">0 / 0</strong>장 봤어요 · ♥ <strong id="pLikes">0</strong>장</span></div>
+      <div class="meta"><span>1단계 · 마음에 드는 사진 고르기 <button class="revlink" data-all="pick">이 단계 전체 보기</button></span><span><strong id="pCount">0 / 0</strong>장 봤어요 · ♥ <strong id="pLikes">0</strong>장 <button class="revlink" data-go="scene">2단계로 →</button></span></div>
       <div class="panel" id="pSingle">
         <div class="zbox" id="s1box"><img alt=""><span class="tag"></span><span class="stamp like">♥ 좋아요</span><span class="stamp nope">✕ 넘기기</span></div>
         <div class="bar">
           <button class="btn ghost small" id="pUndo">↶ 되돌리기</button>
           <button class="big no" id="pNo" aria-label="넘기기">✕</button>
           <button class="big yes" id="pYes" aria-label="좋아요">♥</button>
-          <button class="btn ghost small" data-go="scene">2단계로 넘어가기 →</button>
+          <button class="btn ghost small focusBtn">⛶ 크게 보기</button>
         </div>
         <div class="hint">오른쪽으로 밀면 ♥, 왼쪽으로 밀면 ✕ · 두 번 톡 하면 확대</div>
       </div>
@@ -366,7 +381,7 @@ input[type=password]{background:var(--panel2);border:1px solid var(--line);borde
         <button class="choice maybe" id="soY">🤔<span>고민</span></button>
         <button class="choice out" id="soX">✕<span>빼기</span></button>
       </div>
-      <div class="bar"><button class="btn ghost small" id="soUndo">↶ 되돌리기</button><span class="hint">두 번 톡 하면 확대 · 키보드 1 2 3</span></div>
+      <div class="bar"><button class="btn ghost small" id="soUndo">↶ 되돌리기</button><button class="btn ghost small focusBtn">⛶ 크게 보기</button><span class="hint">두 번 톡 하면 확대 · 키보드 1 2 3</span></div>
     </section>
     <section class="screen" id="sortdone" hidden>
       <div class="done">
@@ -498,6 +513,8 @@ input[type=password]{background:var(--panel2);border:1px solid var(--line);borde
     <button class="btn small" id="lbNext">다음 ▶</button>
   </div>
 </div>
+<button id="focusExit" hidden>작게 보기</button>
+<div id="focusInfo" hidden></div>
 <div id="toast" hidden></div>
 <script>
 (() => {
@@ -762,7 +779,18 @@ function show(id){
   document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-current', b.dataset.go===navKey));
   paintMax(); cheer();
   if(id!=='admin') stopLive();
+  document.body.classList.remove('focus'); $('#focusExit').hidden=$('#focusInfo').hidden=true;
 }
+let focusPref=false; try{ focusPref=localStorage.getItem('wb-focus')==='1'; }catch(e){}
+function applyFocus(){
+  const on = focusPref && (curScreen==='pick' && !$('#pSingle').hidden || curScreen==='sort');
+  document.body.classList.toggle('focus', on);
+  $('#focusExit').hidden=!on; $('#focusInfo').hidden=!on;
+  if(on){ $('#focusInfo').textContent = curScreen==='pick' ? `${$('#pCount').textContent}장 · ♥ ${$('#pLikes').textContent}` : `${$('#soCount').textContent}장`; }
+}
+function setFocus(v){ focusPref=v; try{ localStorage.setItem('wb-focus',v?'1':'0'); }catch(e){} applyFocus(); z1.reset(); zSo.reset(); }
+document.addEventListener('click',e=>{ if(e.target.closest('.focusBtn')) setFocus(true); });
+$('#focusExit').onclick=()=>setFocus(false);
 function go(stage){
   if(!token) return show('login');
   if(STEPS.includes(stage) && !order.length){ show('empty'); return; }
@@ -885,6 +913,7 @@ function renderPick(){
     s1box.style.transition='none'; s1box.style.transform=''; s1box.querySelectorAll('.stamp').forEach(s=>s.style.opacity=0);
     showImg(s1box,s1cur,z1);
     const nx=units[i+1]; if(nx) nx.slice(0,2).forEach(preload);
+    applyFocus();
   } else {
     s1cur=null; $('#pSingle').hidden=true; $('#pGroup').hidden=false;
     if(gUnit!==i){ gUnit=i; gSel=new Set(u.filter(n=>st.s1[n]===1)); }
@@ -963,6 +992,7 @@ function renderSort(){
   $('#soMust').textContent=cnt('must'); $('#soMaybe').textContent=cnt('maybe'); $('#soOut').textContent=cnt('out');
   $('#soUndo').disabled=!st.bucketHist.length;
   showImg(soBox,next,zSo);
+  applyFocus();
   const after=it[it.indexOf(next)+1]; if(after) preload(after);
 }
 function bucket(k){ if(!soCur) return; st.bucket[soCur]=k; st.bucketHist.push(soCur); soCur=null; save(); renderSort(); }
